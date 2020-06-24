@@ -373,7 +373,7 @@ triangleFiles = os.listdir(os.path.join(cwd, 'Images/triangle'))
 circleImages = []
 for i in range(len(circleFiles)):
     # Prior to input, crop the images to take off bottom tag with unnecessary details (orig image is square)
-    preIm = cv2.imread(os.path.join(cwd, 'Images\\circle\\', circleFiles[i]), 0)
+    preIm = cv2.imread(os.path.join(cwd, 'Images/circle/', circleFiles[i]), 0)
     height, width = preIm.shape
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
     if height > 80:
@@ -383,7 +383,7 @@ for i in range(len(circleFiles)):
 rectangleImages = []
 for i in range(len(rectangleFiles)):
     # Prior to input, crop the images to take off bottom tag with unnecessary details (orig image is square)
-    preIm = cv2.imread(os.path.join(cwd, 'Images\\rectangle\\', rectangleFiles[i]), 0)
+    preIm = cv2.imread(os.path.join(cwd, 'Images/rectangle/', rectangleFiles[i]), 0)
     height, width = preIm.shape
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
     if height > 80:
@@ -393,7 +393,7 @@ for i in range(len(rectangleFiles)):
 squareImages = []
 for i in range(len(squareFiles)):
     # Prior to input, crop the images to take off bottom tag with unnecessary details (orig image is square)
-    preIm = cv2.imread(os.path.join(cwd, 'Images\\square\\', squareFiles[i]), 0)
+    preIm = cv2.imread(os.path.join(cwd, 'Images/square/', squareFiles[i]), 0)
     height, width = preIm.shape
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
     if height > 80:
@@ -403,7 +403,7 @@ for i in range(len(squareFiles)):
 triangleImages = []
 for i in range(len(triangleFiles)):
     # Prior to input, crop the images to take off bottom tag with unnecessary details (orig image is square)
-    preIm = cv2.imread(os.path.join(cwd, 'Images\\triangle\\', triangleFiles[i]), 0)
+    preIm = cv2.imread(os.path.join(cwd, 'Images/triangle/', triangleFiles[i]), 0)
     height, width = preIm.shape
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
     if height > 80:
@@ -565,7 +565,7 @@ for alpha1 in alphaValues:
         file.write("-"*50)
         file.close()
 
-        clf.estimator.
+        #clf.estimator
 '''
 #Confusion Matrix Heatmap
 class_names = np.unique(label_data)
