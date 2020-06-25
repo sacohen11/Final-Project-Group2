@@ -373,9 +373,7 @@ triangleFiles = os.listdir(os.path.join(cwd, 'Images/triangle'))
 circleImages = []
 for i in range(len(circleFiles)):
     # Prior to input, crop the images to take off bottom tag with unnecessary details (orig image is square)
-    preIm = cv2.imread(os.path.join(cwd, 'Images\\circle\\', circleFiles[i]), 0)
-
-    print(preIm)
+    preIm = cv2.imread(os.path.join(cwd, 'Images/circle/', circleFiles[i]), 0)
     height, width = preIm.shape
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
     if height > 80:
@@ -385,54 +383,32 @@ for i in range(len(circleFiles)):
 rectangleImages = []
 for i in range(len(rectangleFiles)):
     # Prior to input, crop the images to take off bottom tag with unnecessary details (orig image is square)
-    preIm = cv2.imread(os.path.join(cwd, 'Images\\rectangle\\', rectangleFiles[i]), 0)
-
-
-    try:
-        height, width = preIm.shape
-        # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
-        if height > 80:
-            preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
-        rectangleImages.append(preIm)
-
-    except AttributeError:
-        print("shape not found")
-    except TypeError:
-        print("object is not subscriptable")
+    preIm = cv2.imread(os.path.join(cwd, 'Images/rectangle/', rectangleFiles[i]), 0)
+    height, width = preIm.shape
+    # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
+    if height > 80:
+        preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
+    rectangleImages.append(preIm)
 
 squareImages = []
 for i in range(len(squareFiles)):
     # Prior to input, crop the images to take off bottom tag with unnecessary details (orig image is square)
-    preIm = cv2.imread(os.path.join(cwd, 'Images\\square\\', squareFiles[i]), 0)
+    preIm = cv2.imread(os.path.join(cwd, 'Images/square/', squareFiles[i]), 0)
+    height, width = preIm.shape
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
-
-    try:
-        height, width = preIm.shape
-        if height > 80:
-            preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
-        squareImages.append(preIm)
-
-    except AttributeError:
-        print("shape not found")
-    except TypeError:
-        print("object is not subscriptable")
+    if height > 80:
+        preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
+    squareImages.append(preIm)
 
 triangleImages = []
 for i in range(len(triangleFiles)):
     # Prior to input, crop the images to take off bottom tag with unnecessary details (orig image is square)
-    preIm = cv2.imread(os.path.join(cwd, 'Images\\triangle\\', triangleFiles[i]), 0)
+    preIm = cv2.imread(os.path.join(cwd, 'Images/triangle/', triangleFiles[i]), 0)
+    height, width = preIm.shape
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
-
-    try:
-        height, width = preIm.shape
-        if height > 80:
-            preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
-        triangleImages.append(preIm)
-
-    except AttributeError:
-        print("shape not found")
-    except TypeError:
-        print("object is not subscriptable")
+    if height > 80:
+        preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
+    triangleImages.append(preIm)
 
 #############################################################################################################
 
@@ -486,11 +462,11 @@ unique, count = np.unique(y, return_counts=True)
 
 file = open('ModelOutput.txt', 'w+')
 file.write('Count of Total Images before Augmentation:\n')
-# file.write("Circles:\t\t%d\n" % count[0])
-# file.write("Rectangles:\t\t%d\n" % count[1])
-# file.write("Squares:\t\t%d\n" % count[2])
-# file.write("Triangles:\t\t%d\n" % count[3])
-# file.write("Total:\t\t%d\n" % len(y))
+file.write("Circles:\t\t%d\n" % count[0])
+file.write("Rectangles:\t\t%d\n" % count[1])
+file.write("Squares:\t\t%d\n" % count[2])
+file.write("Triangles:\t\t%d\n" % count[3])
+file.write("Total:\t\t%d\n" % len(y))
 file.write("-"*50)
 file.close()
 
@@ -589,7 +565,7 @@ for alpha1 in alphaValues:
         file.write("-"*50)
         file.close()
 
-        clf.estimator
+        #clf.estimator
 '''
 #Confusion Matrix Heatmap
 class_names = np.unique(label_data)
