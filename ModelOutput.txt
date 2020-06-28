@@ -1,44 +1,24 @@
 Count of Total Images before Augmentation:
-Circles:		540
-Rectangles:		391
-Squares:		372
-Triangles:		381
-Total:		1684
+Circles:		883
+Rectangles:		518
+Squares:		725
+Triangles:		615
+Total:		2741
 --------------------------------------------------
 
 Count of Total Images after Augmentation:
-Circles:		540
-Rectangles:		540
-Squares:		540
-Triangles:		540
-Total:		2160
+Circles:		883
+Rectangles:		518
+Squares:		725
+Triangles:		615
+Total:		2741
 --------------------------------------------------
 Count of Total Training Images after Augmentation:
-Circles:		432
-Rectangles:		432
-Squares:		432
-Triangles:		432
-Total:		1728
---------------------------------------------------
-Multi-Layer Perceptron Metrics:
-Descent Model:		Stochastic Gradient
-Alpha:				0.0001
-Hidden Layers:			20
---------------------------------------------------
-
-Multi-Layer Perceptron Performance:
-Run Time:		43.3658848 seconds
-Accuracy:		0.801
---------------------------------------------------
-Multi-Layer Perceptron Metrics:
-Descent Model:		Stochastic Gradient
-Alpha:				0.0001
-Hidden Layers:			50
---------------------------------------------------
-
-Multi-Layer Perceptron Performance:
-Run Time:		88.82864780000001 seconds
-Accuracy:		0.787
+Circles:		706
+Rectangles:		706
+Squares:		706
+Triangles:		706
+Total:		2824
 --------------------------------------------------
 Multi-Layer Perceptron Metrics:
 Descent Model:		Stochastic Gradient
@@ -47,28 +27,28 @@ Hidden Layers:			100
 --------------------------------------------------
 
 Multi-Layer Perceptron Performance:
-Run Time:		151.8644525 seconds
-Accuracy:		0.812
+Run Time:		5.060587997000001 seconds
+Accuracy:		1.0
 --------------------------------------------------
 Multi-Layer Perceptron Metrics:
 Descent Model:		Stochastic Gradient
-Alpha:				0.001
-Hidden Layers:			20
---------------------------------------------------
-
-Multi-Layer Perceptron Performance:
-Run Time:		43.18724259999999 seconds
-Accuracy:		0.803
---------------------------------------------------
-Multi-Layer Perceptron Metrics:
-Descent Model:		Stochastic Gradient
-Alpha:				0.001
+Alpha:				0.0001
 Hidden Layers:			50
 --------------------------------------------------
 
 Multi-Layer Perceptron Performance:
-Run Time:		86.94240130000003 seconds
-Accuracy:		0.787
+Run Time:		4.1249006470000005 seconds
+Accuracy:		1.0
+--------------------------------------------------
+Multi-Layer Perceptron Metrics:
+Descent Model:		Stochastic Gradient
+Alpha:				0.0001
+Hidden Layers:			20
+--------------------------------------------------
+
+Multi-Layer Perceptron Performance:
+Run Time:		2.900929239 seconds
+Accuracy:		1.0
 --------------------------------------------------
 Multi-Layer Perceptron Metrics:
 Descent Model:		Stochastic Gradient
@@ -77,28 +57,28 @@ Hidden Layers:			100
 --------------------------------------------------
 
 Multi-Layer Perceptron Performance:
-Run Time:		151.3803388 seconds
-Accuracy:		0.812
+Run Time:		5.373469997000001 seconds
+Accuracy:		1.0
 --------------------------------------------------
 Multi-Layer Perceptron Metrics:
 Descent Model:		Stochastic Gradient
-Alpha:				0.01
-Hidden Layers:			20
---------------------------------------------------
-
-Multi-Layer Perceptron Performance:
-Run Time:		42.55850899999996 seconds
-Accuracy:		0.803
---------------------------------------------------
-Multi-Layer Perceptron Metrics:
-Descent Model:		Stochastic Gradient
-Alpha:				0.01
+Alpha:				0.001
 Hidden Layers:			50
 --------------------------------------------------
 
 Multi-Layer Perceptron Performance:
-Run Time:		87.06318910000005 seconds
-Accuracy:		0.787
+Run Time:		3.6388500219999997 seconds
+Accuracy:		1.0
+--------------------------------------------------
+Multi-Layer Perceptron Metrics:
+Descent Model:		Stochastic Gradient
+Alpha:				0.001
+Hidden Layers:			20
+--------------------------------------------------
+
+Multi-Layer Perceptron Performance:
+Run Time:		2.894781403000003 seconds
+Accuracy:		1.0
 --------------------------------------------------
 Multi-Layer Perceptron Metrics:
 Descent Model:		Stochastic Gradient
@@ -107,6 +87,6 @@ Hidden Layers:			100
 --------------------------------------------------
 
 Multi-Layer Perceptron Performance:
-Run Time:		151.00027150000005 seconds
-Accuracy:		0.812
+Run Time:		1.6040962039999975 seconds
+Accuracy:		1.0
 --------------------------------------------------
