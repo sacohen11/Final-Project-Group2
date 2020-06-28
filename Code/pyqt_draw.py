@@ -541,7 +541,7 @@ x_test = sc_X.transform(x_test)
 #::------------------------------------------------------------------------------------
 # Multi-Layer Perceptron
 #::------------------------------------------------------------------------------------
-hiddenLayers = 1 #(20, 50, 100)
+hiddenLayers = 20#(20, 50, 100)
 alphaValues = .0001 #(0.0001, 0.001, 0.01)
 
 #for alpha1 in alphaValues:
@@ -552,7 +552,7 @@ start = timeit.default_timer()
 # Create a MLP Classifier
 clf = MLPClassifier(solver='sgd',       # MLP will converge via Stochastic Gradient Descent
                             alpha=alphaValues,       # alpha is convergence rate (low alpha is slow, but won't overshoot solution)
-                            hidden_layer_sizes=(hiddenLayers,),        # represents a 6400 - Hidden Layers - 2 MLP
+                            hidden_layer_sizes=(hiddenLayers,10,20),        # represents a 6400 - Hidden Layers - 2 MLP
                             random_state=1)
 # Train the model using the training sets
 clf.fit(x_train, y_train)
