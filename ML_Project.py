@@ -178,7 +178,7 @@ def augment (x_train, y_train, f = 0):
     # Generate a count of all classes in the presented, training dataset
     unique, count = np.unique(y_train, return_counts=True)
 
-    print("Training set:")
+    print("Training set before data augmentation:")
     print("Circles:", count[0])
     print("Rectangles:", count[1])
     print("Squares:", count[2])
@@ -201,82 +201,81 @@ def augment (x_train, y_train, f = 0):
         # If the count of any class is below the minimum:
         if count[i] < f:
             # k is the iterable for a while loop; k needs to start at the index of the first instance of each class
-            k = np.where(y_train == unique[i])[0][0]
-            print(k)
-            while count[y_train[k]] < f:
+            for k in range(len(x_train)):
+                if count[y_train[k]] < f:
                 # Randomly choose one of five options for image augmentation:
-                rn = random.randint(0,4)
-                if rn == 0:
-                    '''
-                    Flip the image along the Y-axis
-                    '''
-                    x_temp = np.fliplr(x_train[k])
-                    # print("Flipped", y_train[k])
-                    # plt.imshow(x_train[k])
-                    # plt.show()
+                    rn = random.randint(0,4)
+                    if rn == 0:
+                        '''
+                        Flip the image along the Y-axis
+                        '''
+                        x_temp = np.fliplr(x_train[k])
+                        # print("Flipped", y_train[k])
+                        # plt.imshow(x_train[k])
+                        # plt.show()
 
-                elif rn ==1:
-                    '''
-                    Adds noise to an image
-                    '''
-                    x_temp = sp_noise(x_train[k], 0.01)
-                    # print("Noised", y_train[k])
-                    # plt.imshow(x_train[k])
-                    # plt.show()
-
-
-                elif rn ==2:
-                    '''
-                    Rotates 90 degrees
-                    Source: https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
-                    '''
-                    rows, cols = x_train[k].shape[:2]
-                    M = cv2.getRotationMatrix2D((cols / 2, rows / 2), 90, 1)
-                    x_temp = cv2.warpAffine(x_train[k], M, (cols, rows))
-                    # print("Rotated 30", y_train[k])
-                    # plt.imshow(x_train[k])
-                    # plt.show()
+                    elif rn ==1:
+                        '''
+                        Adds noise to an image
+                        '''
+                        x_temp = sp_noise(x_train[k], 0.01)
+                        # print("Noised", y_train[k])
+                        # plt.imshow(x_train[k])
+                        # plt.show()
 
 
-                elif rn == 3:
-                    '''
-                    Translation of image
-                    Source: http: // wiki.lofarolabs.com / index.php / Translation_of_image
-                    '''
-                    # shifting the image 100 pixels in both dimensions
-                    rows, cols = x_train[k].shape[:2]
-                    M = np.float32([[1, 0, -5], [0, 1, -5]])
-                    x_temp = cv2.warpAffine(x_train[k], M, (cols, rows))
-                    # print("Shifted", y_train[k])
-                    # plt.imshow(x_train[k])
-                    # plt.show()
+                    elif rn ==2:
+                        '''
+                        Rotates 90 degrees
+                        Source: https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
+                        '''
+                        rows, cols = x_train[k].shape[:2]
+                        M = cv2.getRotationMatrix2D((cols / 2, rows / 2), 90, 1)
+                        x_temp = cv2.warpAffine(x_train[k], M, (cols, rows))
+                        # print("Rotated 30", y_train[k])
+                        # plt.imshow(x_train[k])
+                        # plt.show()
 
 
-                elif rn == 4:
-                    '''
-                    Rotates in 180 degrees
-                    Source: https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
-                    '''
-                    rows, cols = x_train[k].shape[:2]
-                    M = cv2.getRotationMatrix2D((cols / 2, rows / 2), 180, 1)
-                    x_temp = cv2.warpAffine(x_train[k], M, (cols, rows))
-                    # print("Rotated 180", y_train[k])
-                    # plt.imshow(x_train[k])
-                    # plt.show()
+                    elif rn == 3:
+                        '''
+                        Translation of image
+                        Source: http: // wiki.lofarolabs.com / index.php / Translation_of_image
+                        '''
+                        # shifting the image 100 pixels in both dimensions
+                        rows, cols = x_train[k].shape[:2]
+                        M = np.float32([[1, 0, -5], [0, 1, -5]])
+                        x_temp = cv2.warpAffine(x_train[k], M, (cols, rows))
+                        # print("Shifted", y_train[k])
+                        # plt.imshow(x_train[k])
+                        # plt.show()
 
-                x_train_new.append(x_temp)
-                # print("New image saved as:", y_train[k])
-                y_train_new.append(y_train[k])
-                # print("Labeled as:", y_train[k])
-                count[y_train[k]] += 1
-                # print("-" * 50)
 
-                # if the k iterable reaches the end of the indexes of x_train without the count of the class reaching
-                # f, reset k to initial (and begin going back through x_train for more augmentation), else add 1 to k.
-                if (k - np.where(y_train == unique[i])[0][0]) < count[i]:
-                    k += 1
-                else:
-                    k = np.where(y_train == unique[i])[0][0]
+                    elif rn == 4:
+                        '''
+                        Rotates in 180 degrees
+                        Source: https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
+                        '''
+                        rows, cols = x_train[k].shape[:2]
+                        M = cv2.getRotationMatrix2D((cols / 2, rows / 2), 180, 1)
+                        x_temp = cv2.warpAffine(x_train[k], M, (cols, rows))
+                        # print("Rotated 180", y_train[k])
+                        # plt.imshow(x_train[k])
+                        # plt.show()
+
+                    x_train_new.append(x_temp)
+                    # print("New image saved as:", y_train[k])
+                    y_train_new.append(y_train[k])
+                    # print("Labeled as:", y_train[k])
+                    count[y_train[k]] += 1
+                    # print("-" * 50)
+
+                    # if the k iterable reaches the end of the indexes of x_train without the count of the class reaching
+                    # f, reset k to initial (and begin going back through x_train for more augmentation), else add 1 to k.
+                    if (k - np.where(y_train == unique[i])[0][0]) < count[i]:
+                        k += 1
+                    else:
+                        k = np.where(y_train == unique[i])[0][0]
 
     x_train_new = np.array(x_train_new)
     print(x_train_new.shape, f)
@@ -347,7 +346,7 @@ def threshold(img):
     Any pixel above that value will be black, anything below will be white.
     Returns a black and white image.
     '''
-    ret, img_threshold = cv2.threshold(img, 30, 255, cv2.THRESH_BINARY_INV)
+    ret, img_threshold = cv2.threshold(img, 130, 255, cv2.THRESH_BINARY_INV)
     return img_threshold
 
 #############################################################################################################
@@ -359,55 +358,64 @@ def threshold(img):
 # Specify current working directory:
 cwd = os.getcwd()
 
-print("-"*50)
-print("Starting image loading and pre-processing...")
-print("-"*50)
-
 # Identify files for images
 circleFiles = os.listdir(os.path.join(cwd, 'Images/circle'))
 rectangleFiles = os.listdir(os.path.join(cwd, 'Images/rectangle'))
 squareFiles = os.listdir(os.path.join(cwd, 'Images/square'))
 triangleFiles = os.listdir(os.path.join(cwd, 'Images/triangle'))
 
-# Fill up lists with image cv2 files
 circleImages = []
 for i in range(len(circleFiles)):
-    # Prior to input, crop the images to take off bottom tag with unnecessary details (orig image is square)
-    preIm = cv2.imread(os.path.join(cwd, 'Images/circle/', circleFiles[i]), 0)
+    preIm = cv2.imread(os.path.join(cwd, 'Images/circle/', circleFiles[1]), 0)
     height, width = preIm.shape
-    # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
+
     if height > 80:
         preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
+
+    # PREPROCESSING: threshold
+    preIm = threshold(preIm)
     circleImages.append(preIm)
 
 rectangleImages = []
 for i in range(len(rectangleFiles)):
-    # Prior to input, crop the images to take off bottom tag with unnecessary details (orig image is square)
-    preIm = cv2.imread(os.path.join(cwd, 'Images/rectangle/', rectangleFiles[i]), 0)
+    preIm = cv2.imread(os.path.join(cwd, 'Images/rectangle/', rectangleFiles[1]), 0)
     height, width = preIm.shape
+
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
     if height > 80:
         preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
+
+    # PREPROCESSING: threshold
+    preIm = threshold(preIm)
+
     rectangleImages.append(preIm)
 
 squareImages = []
 for i in range(len(squareFiles)):
-    # Prior to input, crop the images to take off bottom tag with unnecessary details (orig image is square)
-    preIm = cv2.imread(os.path.join(cwd, 'Images/square/', squareFiles[i]), 0)
+    preIm = cv2.imread(os.path.join(cwd, 'Images/square/', squareFiles[1]), 0)
     height, width = preIm.shape
+
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
     if height > 80:
         preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
+
+    # PREPROCESSING: threshold
+    preIm = threshold(preIm)
+
     squareImages.append(preIm)
 
 triangleImages = []
 for i in range(len(triangleFiles)):
-    # Prior to input, crop the images to take off bottom tag with unnecessary details (orig image is square)
-    preIm = cv2.imread(os.path.join(cwd, 'Images/triangle/', triangleFiles[i]), 0)
+    preIm = cv2.imread(os.path.join(cwd, 'Images/triangle/', triangleFiles[1]), 0)
     height, width = preIm.shape
+
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
     if height > 80:
         preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
+
+    # PREPROCESSING: threshold
+    preIm = threshold(preIm)
+
     triangleImages.append(preIm)
 
 #############################################################################################################
@@ -454,6 +462,17 @@ print("-"*50)
 x = np.append(npCirc, np.append(npRect, np.append(npSqur, npTrig, axis=0), axis=0), axis=0)
 y = integer_labels
 
+# Generate a count of all classes in the presented, training dataset
+unique, count = np.unique(y, return_counts=True)
+
+print("Count classes before Data Split")
+print("Circles:", count[0])
+print("Rectangles:", count[1])
+print("Squares:", count[2])
+print("Triangles:", count[3])
+print("Total:", len(y))
+print("-" * 50)
+
 #::---------------------------------------------------------------------------------
 ## Create a .txt output of model precursors and results
 #::---------------------------------------------------------------------------------
@@ -470,7 +489,14 @@ file.write("Total:\t\t%d\n" % len(y))
 file.write("-"*50)
 file.close()
 
-x, y = augment(x, y)
+
+# Train, test, split the data
+x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=40, test_size=0.20, stratify=y)
+x_test_length = len(x_test)
+y_test_ex = y_test
+
+
+x_train, y_train = augment(x_train, y_train, f=0)
 print("Data augmentation completed.")
 print("-" * 50)
 
@@ -487,10 +513,7 @@ file.write("Total:\t\t%d\n" % len(y))
 file.write("-"*50)
 file.close()
 
-# Train, test, split the data
-x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=40, test_size=0.2, stratify=y)
-x_test_length = len(x_test)
-y_test_ex = y_test
+
 
 # Generate a count of all classes in the training dataset after augmentation
 unique, count = np.unique(y_train, return_counts=True)
@@ -519,7 +542,7 @@ x_test = sc_X.transform(x_test)
 #::------------------------------------------------------------------------------------
 # Multi-Layer Perceptron
 #::------------------------------------------------------------------------------------
-hiddenLayers = (20, 50, 100)
+hiddenLayers = (100, 50, 20)
 alphaValues = (0.0001, 0.001, 0.01)
 
 for alpha1 in alphaValues:
@@ -528,7 +551,7 @@ for alpha1 in alphaValues:
         # Provide a start timer for MLP run
         start = timeit.default_timer()
         # Create a MLP Classifier
-        clf = MLPClassifier(solver='sgd',       # MLP will converge via Stochastic Gradient Descent
+        clf = MLPClassifier(solver='adam',       # MLP will converge via Stochastic Gradient Descent
                             alpha=alpha1,       # alpha is convergence rate (low alpha is slow, but won't overshoot solution)
                             hidden_layer_sizes=(hidLay,),        # represents a 6400 - Hidden Layers - 2 MLP
                             random_state=1)
@@ -540,15 +563,15 @@ for alpha1 in alphaValues:
         # Provide a stop timer for MLP run
         stop = timeit.default_timer()
         print("-" * 80)
-        print("Model Results", namestr(x, globals())[0])
+        print("Model Results", "alphaValue:", alpha1, "hiddenLayers:", hidLay)
         print("-" * 80)
-        print("Accuracy of MLP",namestr(x, globals())[0],":", round(metrics.accuracy_score(y_test, y_pred), 3))
+        print("Accuracy of MLP",":", round(metrics.accuracy_score(y_test, y_pred), 3))
         print("-")
-        print("Confusion Matrix",namestr(x, globals())[0],":")
+        print("Confusion Matrix",":")
         cmx_MLP = confusion_matrix(y_test, y_pred)
         print(cmx_MLP)
         print("-")
-        print("Classification Report MLP",namestr(x, globals())[0],":")
+        print("Classification Report MLP",":")
         cfrp = classification_report(y_test, y_pred)
         print(cfrp)
         print("-")
