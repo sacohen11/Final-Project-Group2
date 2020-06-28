@@ -25,12 +25,13 @@ import matplotlib.patches as ptch
 import random as rd
 import matplotlib.lines as lines           # For triangle creation
 from math import sin, cos, radians         # For sin and cos calcs for better centering squares and rectangles
+import PIL
 
 # Create a figure plot
 fig, ax = plt.subplots()
 
 # Create a certain amount of circles with random variables for origin, line thickness, and radius
-numCirc = 240
+numCirc = 100
 for i in range(numCirc):
     # Set random values for variables:
     centerX = rd.uniform(4, 6)
@@ -42,83 +43,118 @@ for i in range(numCirc):
     p = ptch.CirclePolygon((centerX, centerY), radius, fill=False, edgecolor='black', linewidth=lineWidth)
     ax.add_patch(p)
 
-    ax.set_xlim(0, 10)
-    ax.set_ylim(0, 10)
+    ax.set_xlim(0, 15)
+    ax.set_ylim(0, 15)
     plt.axis('off')
-    plt.savefig(fname=('circleXX' + str(i) + '.jpg'), format='jpg')
+    plt.savefig(fname=('circleNEW' + str(i) + '.jpg'), format='jpg')
     plt.cla()
 
 # Create a certain amount of squares with random variables for origin, line thickness, width, height, and shape angle
-numRect = 240
+numRect = 100
 for i in range(numRect):
     # Set random values for variables:
     # theta is the angle from which the lower left angle of rectangle is tilted from the horizon
-    theta1 = rd.uniform(0, 90)
+    theta1 = rd.uniform(-30, 90)
 
-    height = rd.uniform(3, 5)
-    width = height + rd.uniform(1, 3)   # width will always be greater than height to establish a rectangular shape
+    height = rd.uniform(5, 8)
+    width = height + rd.uniform(4, 8)   # width will always be greater than height to establish a rectangular shape
 
     # Based on the theta and height/width values, set the "center" (lower left) coordinates to avoid cutting off
     #   theta =  0 -> x(1, 9 - width),  y(1, 9 - height)
     #   theta = 90 -> x(1 + height, 9), y(1, 9 - width)
-    centerX = rd.uniform(1 + sin(radians(theta1))*height, 9 - cos(radians(theta1)) * width)
-    centerY = rd.uniform(1, 9 - cos(radians(theta1)) * height - sin(radians(theta1)) * width)
+    centerX = rd.uniform(10 + sin(radians(theta1))*height, 15 - cos(radians(theta1)) * width)
+    centerY = rd.uniform(10, 15 - cos(radians(theta1)) * height - sin(radians(theta1)) * width)
     lineWidth = rd.uniform(1, 18)
 
     # Draw a Rectangle
     p = ptch.Rectangle((centerX, centerY), width, height, theta1, fill=False, edgecolor='black', linewidth=lineWidth)
     ax.add_patch(p)
 
-    ax.set_xlim(0, 10)
-    ax.set_ylim(0, 10)
+    ax.set_xlim(0, 25)
+    ax.set_ylim(0, 25)
     plt.axis('off')
-    plt.savefig(fname=('rectangleXX' + str(i) + '.jpg'), format='jpg')
+    plt.savefig(fname=('rectangleNEW' + str(i) + '.jpg'), format='jpg')
     plt.cla()
 
 # Create a certain amount of squares with random variables for origin, line thickness, width, height, and shape angle
-numSqur = 240
+numSqur = 100
 for i in range(numSqur):
     # Set random values for variables:
     # theta is the degree angle from which the lower left angle of rectangle is tilted from the horizon
     theta1 = rd.uniform(0, 90)
 
-    height = rd.uniform(3, 6)
+    height = rd.uniform(5, 9)
     width = height + rd.gauss(0, 0.5/3)         # width will usually ~equal height will some noise/error
 
     # Based on the theta and height/width values, set the "center" (lower left) coordinates to avoid cutting off
     #   theta =  0 -> (1, 9 - width)
     #   theta = 90 -> (1 + height, 9)
-    centerX = rd.uniform(1 + sin(radians(theta1))*height, 9 - cos(radians(theta1)) * width)
-    centerY = rd.uniform(1, 9 - cos(radians(theta1)) * height - sin(radians(theta1)) * width)
+    centerX = rd.uniform(3 + sin(radians(theta1))*height, 12 - cos(radians(theta1)) * width)
+    centerY = rd.uniform(3, 12 - cos(radians(theta1)) * height - sin(radians(theta1)) * width)
 
-    lineWidth = rd.uniform(1, 18)
+    lineWidth = rd.uniform(2, 18)
 
     # Draw a Rectangle
     p = ptch.Rectangle((centerX, centerY), width, height, theta1, fill=False, edgecolor='black', linewidth=lineWidth)
     ax.add_patch(p)
 
-    ax.set_xlim(0, 10)
-    ax.set_ylim(0, 10)
+    ax.set_xlim(0, 15)
+    ax.set_ylim(0, 15)
     plt.axis('off')
-    plt.savefig(fname=('squareXX' + str(i) + '.jpg'), format='jpg')
+    plt.savefig(fname=('squareNEW' + str(i) + '.jpg'), format='jpg')
     plt.cla()
 
 # Create a certain amount of triangles with random variables for origin, line thickness, and radius, and triangle angles
-numTriangle = 240
+numTriangle = 100
 for i in range(numTriangle):
-    # Make three random points in the 10x10 space
-    p1X, p1Y = rd.uniform(1, 9), rd.uniform(1, 9)
-    p2X, p2Y = rd.uniform(1, 9), rd.uniform(1, 9)
-    p3X, p3Y = rd.uniform(1, 9), rd.uniform(1, 9)
-    lineWidth = rd.uniform(1, 18)
+    # Make three random points in the 25x25 space
+    p1X, p1Y = rd.uniform(6, 19), rd.uniform(6, 19)
+
+    if p1X > 12:
+        p2X = p1X - rd.uniform(3, 8)
+    else:
+        p2X = p1X + rd.uniform(3, 8)
+
+    if p1Y < 12:
+        p2Y = p1Y - rd.uniform(3, 8)
+    else:
+        p2Y = p1Y + rd.uniform(3, 8)
+
+    # p2X, p2Y = rd.uniform(1, 9), rd.uniform(1, 9)
+
+    if p2X > 12:
+        if p1X > 12:
+            p3X = p2X - rd.uniform(3, 8)
+        else:
+            p3X = p2X + rd.uniform(3, 8)
+
+    else:
+        if p1X > 12:
+            p3X = p2X - rd.uniform(3, 8)
+        else:
+            p3X = p2X + rd.uniform(3, 8)
+
+    if p2Y > 12:
+        if p1Y > 12:
+            p3Y = p2Y - rd.uniform(3, 8)
+        else:
+            p3Y = p2Y + rd.uniform(3, 8)
+
+    else:
+        if p1Y > 12:
+            p3Y = p2Y - rd.uniform(3, 8)
+        else:
+            p3Y = p2Y + rd.uniform(3, 8)
+
+    lineWidth = rd.uniform(3, 10)
 
     # Add lines to axis by making three lines between all three points
     ax.add_line(lines.Line2D([p1X, p2X], [p1Y, p2Y], color='black', linewidth=lineWidth))
     ax.add_line(lines.Line2D([p1X, p3X], [p1Y, p3Y], color='black', linewidth=lineWidth))
     ax.add_line(lines.Line2D([p2X, p3X], [p2Y, p3Y], color='black', linewidth=lineWidth))
 
-    ax.set_xlim(0, 10)
-    ax.set_ylim(0, 10)
+    ax.set_xlim(0, 25)
+    ax.set_ylim(0, 25)
     plt.axis('off')
-    plt.savefig(fname=('triangleXX' + str(i) + '.jpg'), format='jpg')
+    plt.savefig(fname=('triangleNEW' + str(i) + '.jpg'), format='jpg')
     plt.cla()
