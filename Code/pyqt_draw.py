@@ -390,7 +390,7 @@ for i in range(len(circleFiles)):
     preIm = cv2.imread(os.path.join(cwd, 'Images/circle/', circleFiles[i]), 0)
     height, width = preIm.shape
 
-    if height > 80:
+    if height > 70:
         preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
 
     # PREPROCESSING: threshold
@@ -403,7 +403,7 @@ for i in range(len(rectangleFiles)):
     height, width = preIm.shape
 
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
-    if height > 80:
+    if height > 70:
         preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
 
     # PREPROCESSING: threshold
@@ -417,7 +417,7 @@ for i in range(len(squareFiles)):
     height, width = preIm.shape
 
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
-    if height > 80:
+    if height > 70:
         preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
 
     # PREPROCESSING: threshold
@@ -431,7 +431,7 @@ for i in range(len(triangleFiles)):
     height, width = preIm.shape
 
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
-    if height > 80:
+    if height > 70:
         preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
 
     # PREPROCESSING: threshold
@@ -510,9 +510,9 @@ file.write("Total:\t\t%d\n" % len(y))
 file.write("-"*50)
 file.close()
 
-x, y = augment(x, y, f=0)
+x, y = augment(x, y, f=count[1])
 # Train, test, split the data
-x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=40, test_size=0.20, stratify=y)
+x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=40, test_size=0.20)#stratify=y)
 x_test_length = len(x_test)
 y_test_ex = y_test
 
@@ -575,7 +575,7 @@ start = timeit.default_timer()
 # Create a MLP Classifier
 clf = MLPClassifier(solver='sgd',       # MLP will converge via Stochastic Gradient Descent
                             alpha=.0001,       # alpha is convergence rate (low alpha is slow, but won't overshoot solution)
-                            hidden_layer_sizes=(10,),        # represents a 6400 - Hidden Layers - 2 MLP
+                            hidden_layer_sizes=(100,),        # represents a 6400 - Hidden Layers - 2 MLP
                             random_state=1)
 # Train the model using the training sets
 clf.fit(x_train, y_train)
@@ -648,7 +648,7 @@ class DrawingPad(QtWidgets.QLabel):
         canvas.fill()
         self.setPixmap(canvas)
 
-        self.pen_width = 5
+        self.pen_width = 20
 
         self.initial_point, self.next_point = None, None
     def mouseMoveEvent(self, a):
@@ -678,7 +678,7 @@ class DrawingPad(QtWidgets.QLabel):
 
 
 WIDTHS = [
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    5, 10, 15, 20, 25, 30
 ]
 
 class QLineWidthButton(QPushButton):
