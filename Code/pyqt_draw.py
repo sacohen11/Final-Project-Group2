@@ -366,7 +366,7 @@ def threshold(img):
     Any pixel above that value will be black, anything below will be white.
     Returns a black and white image.
     '''
-    ret, img_threshold = cv2.threshold(img, 20, 255, cv2.THRESH_BINARY)
+    ret, img_threshold = cv2.threshold(img, 180, 255, cv2.THRESH_BINARY)
     return img_threshold
 
 #############################################################################################################
@@ -563,7 +563,7 @@ x_test = sc_X.transform(x_test)
 #::------------------------------------------------------------------------------------
 # Multi-Layer Perceptron
 #::------------------------------------------------------------------------------------
-hiddenLayers = (100, 50)#, 20)
+hiddenLayers = (20, 50)#, 20)
 alphaValues = (0.0001, 0.0010)
 
 
