@@ -512,7 +512,7 @@ file.close()
 
 x, y = augment(x, y, f=0)
 # Train, test, split the data
-x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=40, test_size=0.20)#, stratify=y)
+x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=40, test_size=0.20, stratify=y)
 x_test_length = len(x_test)
 y_test_ex = y_test
 
@@ -567,48 +567,48 @@ hiddenLayers = (20, 50)#, 20)
 alphaValues = (0.0001, 0.0010)
 
 
-for alpha1 in alphaValues:
-    for hidLay in hiddenLayers:
+#for alpha1 in alphaValues:
+    #for hidLay in hiddenLayers:
 
-        # Provide a start timer for MLP run
-        start = timeit.default_timer()
-        # Create a MLP Classifier
-        clf = MLPClassifier(solver='sgd',       # MLP will converge via Stochastic Gradient Descent
+# Provide a start timer for MLP run
+start = timeit.default_timer()
+# Create a MLP Classifier
+clf = MLPClassifier(solver='sgd',       # MLP will converge via Stochastic Gradient Descent
                             alpha=.0001,       # alpha is convergence rate (low alpha is slow, but won't overshoot solution)
                             hidden_layer_sizes=(10,),        # represents a 6400 - Hidden Layers - 2 MLP
                             random_state=1)
-        # Train the model using the training sets
-        clf.fit(x_train, y_train)
-        # Predict the response for test dataset
-        y_pred = clf.predict(x_test)
+# Train the model using the training sets
+clf.fit(x_train, y_train)
+# Predict the response for test dataset
+y_pred = clf.predict(x_test)
 
-        # Provide a stop timer for MLP run
-        stop = timeit.default_timer()
-        print("-" * 80)
-        print("Model Results", "alphaValue:", alpha1, "hiddenLayers:", hidLay)
-        print("-" * 80)
-        print("Accuracy of MLP",":", round(metrics.accuracy_score(y_test, y_pred), 3))
-        print("-")
-        print("Confusion Matrix",":")
-        cmx_MLP = confusion_matrix(y_test, y_pred)
-        print(cmx_MLP)
-        print("-")
-        print("Classification Report MLP",":")
-        cfrp = classification_report(y_test, y_pred)
-        print(cfrp)
-        print("-")
-
-        file = open('ModelOutput.txt', 'a+')
-        file.write('\nMulti-Layer Perceptron Metrics:\n')
-        file.write("Descent Model:\t\tStochastic Gradient\n")
-        file.write(f"Alpha:\t\t\t\t{alpha1}\n")
-        file.write(f"Hidden Layers:\t\t\t{hidLay}\n")
-        file.write("-"*50)
-        file.write('\n\nMulti-Layer Perceptron Performance:\n')
-        file.write(f"Run Time:\t\t{stop-start} seconds\n")
-        file.write(f"Accuracy:\t\t{round(metrics.accuracy_score(y_test, y_pred), 3)}\n")
-        file.write("-"*50)
-        file.close()
+# Provide a stop timer for MLP run
+stop = timeit.default_timer()
+        # print("-" * 80)
+        # print("Model Results", "alphaValue:", alpha1, "hiddenLayers:", hidLay)
+        # print("-" * 80)
+print("Accuracy of MLP",":", round(metrics.accuracy_score(y_test, y_pred), 3))
+        # print("-")
+        # print("Confusion Matrix",":")
+cmx_MLP = confusion_matrix(y_test, y_pred)
+print(cmx_MLP)
+        # print("-")
+        # print("Classification Report MLP",":")
+cfrp = classification_report(y_test, y_pred)
+print(cfrp)
+        # print("-")
+        #
+        # file = open('ModelOutput.txt', 'a+')
+        # file.write('\nMulti-Layer Perceptron Metrics:\n')
+        # file.write("Descent Model:\t\tStochastic Gradient\n")
+        # file.write(f"Alpha:\t\t\t\t{alpha1}\n")
+        # file.write(f"Hidden Layers:\t\t\t{hidLay}\n")
+        # file.write("-"*50)
+        # file.write('\n\nMulti-Layer Perceptron Performance:\n')
+        # file.write(f"Run Time:\t\t{stop-start} seconds\n")
+        # file.write(f"Accuracy:\t\t{round(metrics.accuracy_score(y_test, y_pred), 3)}\n")
+        # file.write("-"*50)
+        # file.close()
 
         #clf.estimator
 '''
@@ -753,7 +753,8 @@ class MainMenu(QMainWindow):
 
     def on_click(self):
         # self.button.setStyleSheet("border: 2px solid #000000;font: bold;background-color: blue;font-size: 20px;height: 200px;width: 500px;color: white")
-        self.drawing_pad.pixmap().save("picture.jpg")
+        pixmap = self.drawing_pad.pixmap().scaled(80,80, aspectRatioMode=Qt.KeepAspectRatio)
+        pixmap.save("picture.jpg")
         im = cv2.imread(os.path.join(cwd, 'picture.jpg'), 0)
         height, width = im.shape
         print(height)
