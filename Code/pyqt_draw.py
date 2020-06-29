@@ -816,7 +816,7 @@ class MainMenu(QMainWindow):
         # add to dataset
         pics = len([file for file in os.listdir(os.path.join(cwd, f'Images/{butt.text()}/'))])
         print(pics)
-        os.rename(os.path.join(cwd, 'picture.jpg'), os.path.join(cwd, f'Images/{butt.text()}/{butt.text()}{pics+1}.jpg'))
+        os.rename(os.path.join(cwd, 'picture.jpg'), os.path.join(cwd, f'Images/{butt.text()}/{butt.text()}{pics+1000}.jpg'))
         #os.listdir(os.path.join(cwd, f'Images/{butt.text()}') os.path.join(cwd, 'picture.jpg')
         self.close()
         MainMenu.__init__(self)
