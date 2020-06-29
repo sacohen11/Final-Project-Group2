@@ -855,6 +855,10 @@ class MainMenu(QMainWindow):
             im = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
 
         im = threshold(im)
+
+        plt.imshow(im)
+        plt.show()
+
         im = np.reshape(im, (1,-1))
         im = sc_X.transform(im)
         print(50 * '-')
