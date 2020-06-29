@@ -515,6 +515,9 @@ plt.imshow(triangleImages[250])
 plt.show()
 print(triangleImages[250].shape)
 
+
+#Source of "Find and Crop" function: https://github.com/imneonizer/Find-and-crop-objects-From-images-using-OpenCV-and-Python/blob/master/crop_objects.py
+
 #############################################################################################################
 
 '''
