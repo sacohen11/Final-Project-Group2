@@ -366,7 +366,7 @@ def threshold(img):
     Any pixel above that value will be black, anything below will be white.
     Returns a black and white image.
     '''
-    ret, img_threshold = cv2.threshold(img, 180, 255, cv2.THRESH_BINARY)
+    ret, img_threshold = cv2.threshold(img, 220, 255, cv2.THRESH_BINARY)
     return img_threshold
 
 #############################################################################################################
@@ -390,54 +390,130 @@ for i in range(len(circleFiles)):
     preIm = cv2.imread(os.path.join(cwd, 'Images/circle/', circleFiles[i]), 0)
     height, width = preIm.shape
 
-    if height > 70:
-        preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
+    # applying canny edge detection
+    edged = cv2.Canny(preIm, 10, 250)
+
+    # finding contours
+    (_, cnts, _) = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    idx = 0
+    for c in cnts:
+        x, y, w, h = cv2.boundingRect(c)
+        if w > 10 and h > 10:
+            idx += 1
+            preImg = preIm[y:y + h, x:x + w]
+            # cropping images
+            #cv2.imwrite("cropped/" + str(idx) + '.png', new_img)
+
+    if height < 700:
+        preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
 
     # PREPROCESSING: threshold
     preIm = threshold(preIm)
+
     circleImages.append(preIm)
+
+plt.imshow(circleImages[252])
+plt.show()
+print(circleImages[252].shape)
+
+
 
 rectangleImages = []
 for i in range(len(rectangleFiles)):
     preIm = cv2.imread(os.path.join(cwd, 'Images/rectangle/', rectangleFiles[i]), 0)
     height, width = preIm.shape
 
+    # applying canny edge detection
+    edged = cv2.Canny(preIm, 10, 250)
+
+    # finding contours
+    (_, cnts, _) = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    idx = 0
+    for c in cnts:
+        x, y, w, h = cv2.boundingRect(c)
+        if w > 10 and h > 10:
+            idx += 1
+            preImg = preIm[y:y + h, x:x + w]
+
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
-    if height > 70:
-        preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
+    if height < 700:
+        preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
 
     # PREPROCESSING: threshold
     preIm = threshold(preIm)
 
     rectangleImages.append(preIm)
 
+plt.imshow(rectangleImages[220])
+plt.show()
+print(rectangleImages[220].shape)
+
+
+
+
 squareImages = []
 for i in range(len(squareFiles)):
     preIm = cv2.imread(os.path.join(cwd, 'Images/square/', squareFiles[i]), 0)
     height, width = preIm.shape
 
+    # applying canny edge detection
+    edged = cv2.Canny(preIm, 10, 250)
+
+    # finding contours
+    (_, cnts, _) = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    idx = 0
+    for c in cnts:
+        x, y, w, h = cv2.boundingRect(c)
+        if w > 10 and h > 10:
+            idx += 1
+            preImg = preIm[y:y + h, x:x + w]
+
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
-    if height > 70:
-        preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
+    if height < 700:
+        preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
 
     # PREPROCESSING: threshold
     preIm = threshold(preIm)
 
     squareImages.append(preIm)
 
+plt.imshow(squareImages[250])
+plt.show()
+print(squareImages[250].shape)
+
+
+
 triangleImages = []
 for i in range(len(triangleFiles)):
     preIm = cv2.imread(os.path.join(cwd, 'Images/triangle/', triangleFiles[i]), 0)
     height, width = preIm.shape
 
+    # applying canny edge detection
+    edged2 = cv2.Canny(preIm, 10, 250)
+
+    # finding contours
+    (_, cnts, _) = cv2.findContours(edged2.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    idx = 0
+    for c in cnts:
+        x, y, w, h = cv2.boundingRect(c)
+        if w > 10 and h > 10:
+            idx += 1
+            preImg = preIm[y:y + h, x:x + w]
+            # cropping images
+
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
-    if height > 70:
-        preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
+    if height > 10:
+        preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
 
     # PREPROCESSING: threshold
     preIm = threshold(preIm)
 
     triangleImages.append(preIm)
+
+
+plt.imshow(triangleImages[250])
+plt.show()
+print(triangleImages[250].shape)
 
 #############################################################################################################
 
@@ -510,7 +586,7 @@ file.write("Total:\t\t%d\n" % len(y))
 file.write("-"*50)
 file.close()
 
-x, y = augment(x, y, f=count[1])
+x, y = augment(x, y)
 # Train, test, split the data
 x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=40, test_size=0.20)#stratify=y)
 x_test_length = len(x_test)
@@ -576,7 +652,8 @@ start = timeit.default_timer()
 clf = MLPClassifier(solver='sgd',       # MLP will converge via Stochastic Gradient Descent
                             alpha=.0001,       # alpha is convergence rate (low alpha is slow, but won't overshoot solution)
                             hidden_layer_sizes=(100,),        # represents a 6400 - Hidden Layers - 2 MLP
-                            random_state=1)
+                            random_state=1,
+                            early_stopping=True)
 # Train the model using the training sets
 clf.fit(x_train, y_train)
 # Predict the response for test dataset
@@ -760,8 +837,22 @@ class MainMenu(QMainWindow):
         print(height)
         print(width)
         # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
-        if height > 80:
-            im = cv2.resize(im, (80, 80), interpolation=cv2.INTER_AREA)
+        # applying canny edge detection
+
+        edged = cv2.Canny(im, 10, 250)
+
+        # finding contours
+        (_, cnts, _) = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        idx = 0
+        for c in cnts:
+            x, y, w, h = cv2.boundingRect(c)
+            if w > 10 and h > 10:
+                idx += 1
+                preImg = im[y:y + h, x:x + w]
+
+        # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
+        if height < 700:
+            im = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
 
         im = threshold(im)
         im = np.reshape(im, (1,-1))
