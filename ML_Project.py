@@ -346,7 +346,7 @@ def threshold(img):
     Any pixel above that value will be black, anything below will be white.
     Returns a black and white image.
     '''
-    ret, img_threshold = cv2.threshold(img, 130, 255, cv2.THRESH_BINARY_INV)
+    ret, img_threshold = cv2.threshold(img, 5, 255, cv2.THRESH_BINARY)
     return img_threshold
 
 #############################################################################################################
@@ -366,7 +366,7 @@ triangleFiles = os.listdir(os.path.join(cwd, 'Images/triangle'))
 
 circleImages = []
 for i in range(len(circleFiles)):
-    preIm = cv2.imread(os.path.join(cwd, 'Images/circle/', circleFiles[1]), 0)
+    preIm = cv2.imread(os.path.join(cwd, 'Images/circle/', circleFiles[i]), 0)
     height, width = preIm.shape
 
     if height > 80:
@@ -378,7 +378,7 @@ for i in range(len(circleFiles)):
 
 rectangleImages = []
 for i in range(len(rectangleFiles)):
-    preIm = cv2.imread(os.path.join(cwd, 'Images/rectangle/', rectangleFiles[1]), 0)
+    preIm = cv2.imread(os.path.join(cwd, 'Images/rectangle/', rectangleFiles[i]), 0)
     height, width = preIm.shape
 
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
@@ -392,7 +392,7 @@ for i in range(len(rectangleFiles)):
 
 squareImages = []
 for i in range(len(squareFiles)):
-    preIm = cv2.imread(os.path.join(cwd, 'Images/square/', squareFiles[1]), 0)
+    preIm = cv2.imread(os.path.join(cwd, 'Images/square/', squareFiles[i]), 0)
     height, width = preIm.shape
 
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
@@ -406,7 +406,7 @@ for i in range(len(squareFiles)):
 
 triangleImages = []
 for i in range(len(triangleFiles)):
-    preIm = cv2.imread(os.path.join(cwd, 'Images/triangle/', triangleFiles[1]), 0)
+    preIm = cv2.imread(os.path.join(cwd, 'Images/triangle/', triangleFiles[i]), 0)
     height, width = preIm.shape
 
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
@@ -559,7 +559,7 @@ for alpha1 in alphaValues:
         clf.fit(x_train, y_train)
         # Predict the response for test dataset
         y_pred = clf.predict(x_test)
-
+        print(x_test)
         # Provide a stop timer for MLP run
         stop = timeit.default_timer()
         print("-" * 80)

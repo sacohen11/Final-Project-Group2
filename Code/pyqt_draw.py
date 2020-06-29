@@ -18,7 +18,6 @@ from PyQt5.QtWidgets import QGroupBox  # Group Box
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure  # Figure
 
-
 '''
 Machine Learning I - Project
 Authors:    Sam Cohen
@@ -188,10 +187,8 @@ def sp_noise(image, prob):
 def augment (x_train, y_train, f = 0):
     '''
     Generate new images of minority classes via augmentation to a minimum value of "f"
-
     "f" defaults to the maximum count of any class, unless specified, so all classes have equal representation in model.
     New images are either rotated 90, rotated 180, flipped, switched or noised.
-
     This function requires that the x_train and y_train arrays are symmetrical (i.e., tied to each other) and sorted
     according to the classes in y_train.
     '''
@@ -314,6 +311,7 @@ def augment (x_train, y_train, f = 0):
     print("-" * 50)
     return x_train, y_train
 
+
 def namestr(obj, namespace):
     '''
     Returns the name of an object.
@@ -368,7 +366,7 @@ def threshold(img):
     Any pixel above that value will be black, anything below will be white.
     Returns a black and white image.
     '''
-    ret, img_threshold = cv2.threshold(img, 30, 255, cv2.THRESH_BINARY_INV)
+    ret, img_threshold = cv2.threshold(img, 20, 255, cv2.THRESH_BINARY)
     return img_threshold
 
 #############################################################################################################
@@ -380,10 +378,6 @@ def threshold(img):
 # Specify current working directory:
 os.chdir('..')
 cwd = os.getcwd()
-print(cwd)
-print("-"*50)
-print("Starting image loading and pre-processing...")
-print("-"*50)
 
 # Identify files for images
 circleFiles = os.listdir(os.path.join(cwd, 'Images/circle'))
@@ -391,45 +385,58 @@ rectangleFiles = os.listdir(os.path.join(cwd, 'Images/rectangle'))
 squareFiles = os.listdir(os.path.join(cwd, 'Images/square'))
 triangleFiles = os.listdir(os.path.join(cwd, 'Images/triangle'))
 
-# Fill up lists with image cv2 files
 circleImages = []
 for i in range(len(circleFiles)):
-    # Prior to input, crop the images to take off bottom tag with unnecessary details (orig image is square)
     preIm = cv2.imread(os.path.join(cwd, 'Images/circle/', circleFiles[i]), 0)
     height, width = preIm.shape
-    # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
+
     if height > 80:
         preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
+
+    # PREPROCESSING: threshold
+    preIm = threshold(preIm)
     circleImages.append(preIm)
 
 rectangleImages = []
 for i in range(len(rectangleFiles)):
-    # Prior to input, crop the images to take off bottom tag with unnecessary details (orig image is square)
     preIm = cv2.imread(os.path.join(cwd, 'Images/rectangle/', rectangleFiles[i]), 0)
     height, width = preIm.shape
+
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
     if height > 80:
         preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
+
+    # PREPROCESSING: threshold
+    preIm = threshold(preIm)
+
     rectangleImages.append(preIm)
 
 squareImages = []
 for i in range(len(squareFiles)):
-    # Prior to input, crop the images to take off bottom tag with unnecessary details (orig image is square)
     preIm = cv2.imread(os.path.join(cwd, 'Images/square/', squareFiles[i]), 0)
     height, width = preIm.shape
+
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
     if height > 80:
         preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
+
+    # PREPROCESSING: threshold
+    preIm = threshold(preIm)
+
     squareImages.append(preIm)
 
 triangleImages = []
 for i in range(len(triangleFiles)):
-    # Prior to input, crop the images to take off bottom tag with unnecessary details (orig image is square)
     preIm = cv2.imread(os.path.join(cwd, 'Images/triangle/', triangleFiles[i]), 0)
     height, width = preIm.shape
+
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
     if height > 80:
         preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
+
+    # PREPROCESSING: threshold
+    preIm = threshold(preIm)
+
     triangleImages.append(preIm)
 
 #############################################################################################################
@@ -476,6 +483,17 @@ print("-"*50)
 x = np.append(npCirc, np.append(npRect, np.append(npSqur, npTrig, axis=0), axis=0), axis=0)
 y = integer_labels
 
+# Generate a count of all classes in the presented, training dataset
+unique, count = np.unique(y, return_counts=True)
+
+print("Count classes before Data Split")
+print("Circles:", count[0])
+print("Rectangles:", count[1])
+print("Squares:", count[2])
+print("Triangles:", count[3])
+print("Total:", len(y))
+print("-" * 50)
+
 #::---------------------------------------------------------------------------------
 ## Create a .txt output of model precursors and results
 #::---------------------------------------------------------------------------------
@@ -492,7 +510,14 @@ file.write("Total:\t\t%d\n" % len(y))
 file.write("-"*50)
 file.close()
 
-x, y = augment(x, y)
+x, y = augment(x, y, f=0)
+# Train, test, split the data
+x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=40, test_size=0.20)#, stratify=y)
+x_test_length = len(x_test)
+y_test_ex = y_test
+
+
+#x_train, y_train = augment(x_train, y_train, f=0)
 print("Data augmentation completed.")
 print("-" * 50)
 
@@ -509,10 +534,7 @@ file.write("Total:\t\t%d\n" % len(y))
 file.write("-"*50)
 file.close()
 
-# Train, test, split the data
-x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=40, test_size=0.2, stratify=y)
-x_test_length = len(x_test)
-y_test_ex = y_test
+
 
 # Generate a count of all classes in the training dataset after augmentation
 unique, count = np.unique(y_train, return_counts=True)
@@ -541,54 +563,54 @@ x_test = sc_X.transform(x_test)
 #::------------------------------------------------------------------------------------
 # Multi-Layer Perceptron
 #::------------------------------------------------------------------------------------
-hiddenLayers = 20#(20, 50, 100)
-alphaValues = .0001 #(0.0001, 0.001, 0.01)
+hiddenLayers = (100, 50)#, 20)
+alphaValues = (0.0001, 0.0010)
 
-#for alpha1 in alphaValues:
-    #for hidLay in hiddenLayers:
+
+for alpha1 in alphaValues:
+    for hidLay in hiddenLayers:
 
         # Provide a start timer for MLP run
-start = timeit.default_timer()
-# Create a MLP Classifier
-clf = MLPClassifier(solver='sgd',       # MLP will converge via Stochastic Gradient Descent
-                            alpha=alphaValues,       # alpha is convergence rate (low alpha is slow, but won't overshoot solution)
-                            hidden_layer_sizes=(hiddenLayers,10,20),        # represents a 6400 - Hidden Layers - 2 MLP
+        start = timeit.default_timer()
+        # Create a MLP Classifier
+        clf = MLPClassifier(solver='sgd',       # MLP will converge via Stochastic Gradient Descent
+                            alpha=.0001,       # alpha is convergence rate (low alpha is slow, but won't overshoot solution)
+                            hidden_layer_sizes=(10,),        # represents a 6400 - Hidden Layers - 2 MLP
                             random_state=1)
-# Train the model using the training sets
-clf.fit(x_train, y_train)
-# Predict the response for test dataset
-y_pred = clf.predict(x_test)
+        # Train the model using the training sets
+        clf.fit(x_train, y_train)
+        # Predict the response for test dataset
+        y_pred = clf.predict(x_test)
 
+        # Provide a stop timer for MLP run
+        stop = timeit.default_timer()
+        print("-" * 80)
+        print("Model Results", "alphaValue:", alpha1, "hiddenLayers:", hidLay)
+        print("-" * 80)
+        print("Accuracy of MLP",":", round(metrics.accuracy_score(y_test, y_pred), 3))
+        print("-")
+        print("Confusion Matrix",":")
+        cmx_MLP = confusion_matrix(y_test, y_pred)
+        print(cmx_MLP)
+        print("-")
+        print("Classification Report MLP",":")
+        cfrp = classification_report(y_test, y_pred)
+        print(cfrp)
+        print("-")
 
-# Provide a stop timer for MLP run
-stop = timeit.default_timer()
-print("-" * 80)
-print("Model Results", namestr(x, globals())[0])
-print("-" * 80)
-print("Accuracy of MLP",namestr(x, globals())[0],":", round(metrics.accuracy_score(y_test, y_pred), 3))
-print("-")
-print("Confusion Matrix",namestr(x, globals())[0],":")
-cmx_MLP = confusion_matrix(y_test, y_pred)
-print(cmx_MLP)
-print("-")
-print("Classification Report MLP",namestr(x, globals())[0],":")
-cfrp = classification_report(y_test, y_pred)
-print(cfrp)
-print("-")
+        file = open('ModelOutput.txt', 'a+')
+        file.write('\nMulti-Layer Perceptron Metrics:\n')
+        file.write("Descent Model:\t\tStochastic Gradient\n")
+        file.write(f"Alpha:\t\t\t\t{alpha1}\n")
+        file.write(f"Hidden Layers:\t\t\t{hidLay}\n")
+        file.write("-"*50)
+        file.write('\n\nMulti-Layer Perceptron Performance:\n')
+        file.write(f"Run Time:\t\t{stop-start} seconds\n")
+        file.write(f"Accuracy:\t\t{round(metrics.accuracy_score(y_test, y_pred), 3)}\n")
+        file.write("-"*50)
+        file.close()
 
-file = open('ModelOutput.txt', 'a+')
-file.write('\nMulti-Layer Perceptron Metrics:\n')
-file.write("Descent Model:\t\tStochastic Gradient\n")
-file.write(f"Alpha:\t\t\t\t{alphaValues}\n")
-file.write(f"Hidden Layers:\t\t\t{hiddenLayers}\n")
-file.write("-"*50)
-file.write('\n\nMulti-Layer Perceptron Performance:\n')
-file.write(f"Run Time:\t\t{stop-start} seconds\n")
-file.write(f"Accuracy:\t\t{round(metrics.accuracy_score(y_test, y_pred), 3)}\n")
-file.write("-"*50)
-file.close()
-
-#clf.estimator
+        #clf.estimator
 '''
 #Confusion Matrix Heatmap
 class_names = np.unique(label_data)
@@ -734,18 +756,34 @@ class MainMenu(QMainWindow):
         self.drawing_pad.pixmap().save("picture.jpg")
         im = cv2.imread(os.path.join(cwd, 'picture.jpg'), 0)
         height, width = im.shape
+        print(height)
+        print(width)
         # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
         if height > 80:
             im = cv2.resize(im, (80, 80), interpolation=cv2.INTER_AREA)
-        im = im.reshape(1,-1)
-        #print(im)
+
+        im = threshold(im)
+        im = np.reshape(im, (1,-1))
+        im = sc_X.transform(im)
+        print(50 * '-')
+        print(im)
+        print(50 * '-')
+        print(im.shape)
+        print(50 * '-')
+        print(im.max())
+        print(50 * '-')
         pred = clf.predict(im)
+        print(pred[0])
+        print(50*'-')
+        print(x_test)
+        print(50 * '-')
+        print(x_test.max())
         if pred[0] == 0:
             pred_shape = 'Circle'
         if pred[0] == 1:
-            pred_shape = 'Square'
-        if pred[0] == 2:
             pred_shape = 'Rectangle'
+        if pred[0] == 2:
+            pred_shape = 'Square'
         if pred[0] == 3:
             pred_shape = "Triangle"
         pred_text = f"You drew a {pred_shape}"
