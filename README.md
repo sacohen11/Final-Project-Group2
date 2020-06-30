@@ -12,4 +12,4 @@ The structure of the repository is very simple. Here is a list of the folders an
 
 3). Final-Group-Presentation - Contains the final presentation of the group
 
-4). Final-Group-Report - Contains the final report of the group
+4). ML Group2 Final Report - The final report of the group
