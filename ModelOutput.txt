@@ -2,8 +2,8 @@ Count of Total Images before Augmentation:
 Circles:		817
 Rectangles:		540
 Squares:		747
-Triangles:		649
-Total:		2753
+Triangles:		646
+Total:		2750
 --------------------------------------------------
 
 Count of Total Images after Augmentation:
