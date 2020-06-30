@@ -393,7 +393,9 @@ for i in range(len(circleFiles)):
     edged = cv2.Canny(preIm, 10, 250)
 
     # finding contours
-    (_, cnts, _) = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnts, other = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+   # (_, cnts, _) = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     idx = 0
     for c in cnts:
         x, y, w, h = cv2.boundingRect(c)
@@ -426,7 +428,7 @@ for i in range(len(rectangleFiles)):
     edged = cv2.Canny(preIm, 10, 250)
 
     # finding contours
-    (_, cnts, _) = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnts, other = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     idx = 0
     for c in cnts:
         x, y, w, h = cv2.boundingRect(c)
@@ -461,7 +463,7 @@ for i in range(len(squareFiles)):
     edged = cv2.Canny(preIm, 10, 250)
 
     # finding contours
-    (_, cnts, _) = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnts, other = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     idx = 0
     for c in cnts:
         x, y, w, h = cv2.boundingRect(c)
@@ -497,7 +499,7 @@ for i in range(len(triangleFiles)):
     edged2 = cv2.Canny(preIm, 10, 250)
 
     # finding contours
-    (_, cnts, _) = cv2.findContours(edged2.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnts, other = cv2.findContours(edged2.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     idx = 0
     for c in cnts:
         x, y, w, h = cv2.boundingRect(c)
@@ -864,15 +866,14 @@ class MainMenu(QMainWindow):
         pixmap.save("picture.jpg")
         im = cv2.imread(os.path.join(cwd, 'picture.jpg'), 0)
         height, width = im.shape
-        print(height)
-        print(width)
+
         # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
         # applying canny edge detection
 
         edged = cv2.Canny(im, 10, 250)
 
         # finding contours
-        (_, cnts, _) = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cnts, other = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         idx = 0
         for c in cnts:
             x, y, w, h = cv2.boundingRect(c)
