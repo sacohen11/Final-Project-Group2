@@ -866,8 +866,7 @@ class MainMenu(QMainWindow):
         pixmap.save("picture.jpg")
         im = cv2.imread(os.path.join(cwd, 'picture.jpg'), 0)
         height, width = im.shape
-        print(height)
-        print(width)
+
         # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
         # applying canny edge detection
 
