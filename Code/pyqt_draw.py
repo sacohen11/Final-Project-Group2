@@ -44,7 +44,7 @@ from sklearn.metrics import confusion_matrix
 import seaborn as sns
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
-
+import pandas as pd
 from sklearn.neural_network import MLPClassifier
 import timeit                  # Used for determining processing time for MLP
 warnings.filterwarnings("ignore")
@@ -311,7 +311,6 @@ def augment (x_train, y_train, f = 0):
     print("-" * 50)
     return x_train, y_train
 
-
 def namestr(obj, namespace):
     '''
     Returns the name of an object.
@@ -412,11 +411,8 @@ for i in range(len(circleFiles)):
 
     circleImages.append(preIm)
 
-plt.imshow(circleImages[252])
+plt.imshow(circleImages[np.random.randint(1,300)])
 plt.show()
-print(circleImages[252].shape)
-
-
 
 rectangleImages = []
 for i in range(len(rectangleFiles)):
@@ -444,12 +440,8 @@ for i in range(len(rectangleFiles)):
 
     rectangleImages.append(preIm)
 
-plt.imshow(rectangleImages[220])
+plt.imshow(rectangleImages[np.random.randint(1,300)])
 plt.show()
-print(rectangleImages[220].shape)
-
-
-
 
 squareImages = []
 for i in range(len(squareFiles)):
@@ -477,10 +469,8 @@ for i in range(len(squareFiles)):
 
     squareImages.append(preIm)
 
-plt.imshow(squareImages[250])
+plt.imshow(squareImages[np.random.randint(1,300)])
 plt.show()
-print(squareImages[250].shape)
-
 
 
 triangleImages = []
@@ -510,10 +500,8 @@ for i in range(len(triangleFiles)):
 
     triangleImages.append(preIm)
 
-
-plt.imshow(triangleImages[250])
+plt.imshow(triangleImages[np.random.randint(1,300)])
 plt.show()
-print(triangleImages[250].shape)
 
 
 #Source of "Find and Crop" function: https://github.com/imneonizer/Find-and-crop-objects-From-images-using-OpenCV-and-Python/blob/master/crop_objects.py
@@ -655,8 +643,7 @@ start = timeit.default_timer()
 clf = MLPClassifier(solver='sgd',       # MLP will converge via Stochastic Gradient Descent
                             alpha=.0001,       # alpha is convergence rate (low alpha is slow, but won't overshoot solution)
                             hidden_layer_sizes=(100,),        # represents a 6400 - Hidden Layers - 2 MLP
-                            random_state=1,
-                            early_stopping=True)
+                            random_state=1)
 # Train the model using the training sets
 clf.fit(x_train, y_train)
 # Predict the response for test dataset
@@ -676,6 +663,22 @@ print(cmx_MLP)
         # print("Classification Report MLP",":")
 cfrp = classification_report(y_test, y_pred)
 print(cfrp)
+
+# Confusion Matrix Heatmap
+class_names = np.unique(label_data)
+df_cm = pd.DataFrame(cmx_MLP, index=class_names, columns=class_names)
+plt.figure(figsize=(6, 6))
+hm = sns.heatmap(df_cm, cmap="Blues", cbar=False, annot=True, square=True, fmt='d', annot_kws={'size': 20},
+                 yticklabels=df_cm.columns, xticklabels=df_cm.columns)
+hm.yaxis.set_ticklabels(hm.yaxis.get_ticklabels(), rotation=0, ha='right', fontsize=10)
+hm.xaxis.set_ticklabels(hm.xaxis.get_ticklabels(), rotation=0, ha='right', fontsize=10)
+plt.ylabel('True label', fontsize=15)
+plt.xlabel('Predicted label', fontsize=15)
+plt.title(("MLP Classifier"))
+
+# Show heat map
+plt.tight_layout()
+plt.show()
         # print("-")
         #
         # file = open('ModelOutput.txt', 'a+')
@@ -689,6 +692,9 @@ print(cfrp)
         # file.write(f"Accuracy:\t\t{round(metrics.accuracy_score(y_test, y_pred), 3)}\n")
         # file.write("-"*50)
         # file.close()
+
+
+
 
         #clf.estimator
 '''
@@ -833,7 +839,7 @@ class MainMenu(QMainWindow):
 
     def on_click(self):
         # self.button.setStyleSheet("border: 2px solid #000000;font: bold;background-color: blue;font-size: 20px;height: 200px;width: 500px;color: white")
-        pixmap = self.drawing_pad.pixmap().scaled(80,80, aspectRatioMode=Qt.KeepAspectRatio)
+        pixmap = self.drawing_pad.pixmap().scaled(80, 80, aspectRatioMode=Qt.KeepAspectRatio)
         pixmap.save("picture.jpg")
         im = cv2.imread(os.path.join(cwd, 'picture.jpg'), 0)
         height, width = im.shape
@@ -862,7 +868,7 @@ class MainMenu(QMainWindow):
         plt.imshow(im)
         plt.show()
 
-        im = np.reshape(im, (1,-1))
+        im = np.reshape(im, (1, -1))
         im = sc_X.transform(im)
         print(50 * '-')
         print(im)
@@ -873,7 +879,7 @@ class MainMenu(QMainWindow):
         print(50 * '-')
         pred = clf.predict(im)
         print(pred[0])
-        print(50*'-')
+        print(50 * '-')
         print(x_test)
         print(50 * '-')
         print(x_test.max())
@@ -894,6 +900,7 @@ class MainMenu(QMainWindow):
         msgBox.buttonClicked.connect(self.shapeButton)
         msgBox.exec()
         self.hbox.addWidget(msgBox)
+
 
     def shapeButton(self, butt):
         if butt.text() == "Yes":
