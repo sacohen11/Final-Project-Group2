@@ -1,5 +1,7 @@
 # Final-Project-Group2
 
+This project aims to design a neural network to classify simple shapes.
+
 # Structure of the Repository
 
 The structure of the repository is very simple. Here is a list of the folders and their contents:
