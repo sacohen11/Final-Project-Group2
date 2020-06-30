@@ -896,19 +896,8 @@ class MainMenu(QMainWindow):
 
         im = np.reshape(im, (1, -1))
         im = sc_X.transform(im)
-        print(50 * '-')
-        print(im)
-        print(50 * '-')
-        print(im.shape)
-        print(50 * '-')
-        print(im.max())
-        print(50 * '-')
         pred = clf.predict(im)
-        print(pred[0])
-        print(50 * '-')
-        print(x_test)
-        print(50 * '-')
-        print(x_test.max())
+
         if pred[0] == 0:
             pred_shape = 'Circle'
         if pred[0] == 1:
