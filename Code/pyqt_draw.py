@@ -44,7 +44,7 @@ from sklearn.metrics import confusion_matrix
 import seaborn as sns
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
-
+import pandas as pd
 from sklearn.neural_network import MLPClassifier
 import timeit                  # Used for determining processing time for MLP
 warnings.filterwarnings("ignore")
@@ -311,7 +311,6 @@ def augment (x_train, y_train, f = 0):
     print("-" * 50)
     return x_train, y_train
 
-
 def namestr(obj, namespace):
     '''
     Returns the name of an object.
@@ -366,7 +365,7 @@ def threshold(img):
     Any pixel above that value will be black, anything below will be white.
     Returns a black and white image.
     '''
-    ret, img_threshold = cv2.threshold(img, 180, 255, cv2.THRESH_BINARY)
+    ret, img_threshold = cv2.threshold(img, 220, 255, cv2.THRESH_BINARY)
     return img_threshold
 
 #############################################################################################################
@@ -390,54 +389,143 @@ for i in range(len(circleFiles)):
     preIm = cv2.imread(os.path.join(cwd, 'Images/circle/', circleFiles[i]), 0)
     height, width = preIm.shape
 
-    if height > 80:
-        preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
+    # applying canny edge detection
+    edged = cv2.Canny(preIm, 10, 250)
+
+    # finding contours
+    (_, cnts, _) = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    idx = 0
+    for c in cnts:
+        x, y, w, h = cv2.boundingRect(c)
+        if w > h:
+            idx += 1
+            preImg = preIm[y:y + w, x:x + w]
+        else:
+            idx += 1
+            preImg = preIm[y:y + h, x:x + h]
+            # cropping images
+            #cv2.imwrite("cropped/" + str(idx) + '.png', new_img)
+
+    if height < 700:
+        preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
 
     # PREPROCESSING: threshold
     preIm = threshold(preIm)
+
     circleImages.append(preIm)
+
+plt.imshow(circleImages[0])
+plt.show()
 
 rectangleImages = []
 for i in range(len(rectangleFiles)):
     preIm = cv2.imread(os.path.join(cwd, 'Images/rectangle/', rectangleFiles[i]), 0)
     height, width = preIm.shape
 
+    # applying canny edge detection
+    edged = cv2.Canny(preIm, 10, 250)
+
+    # finding contours
+    (_, cnts, _) = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    idx = 0
+    for c in cnts:
+        x, y, w, h = cv2.boundingRect(c)
+        if w > h:
+            idx += 1
+            preImg = preIm[y:y + w, x:x + w]
+        else:
+            idx += 1
+            preImg = preIm[y:y + h, x:x + h]
+            # cropping images
+            #cv2.imwrite("cropped/" + str(idx) + '.png', new_img)
+
+
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
-    if height > 80:
-        preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
+    if height < 700:
+        preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
 
     # PREPROCESSING: threshold
     preIm = threshold(preIm)
 
     rectangleImages.append(preIm)
 
+plt.imshow(rectangleImages[np.random.randint(1,500)])
+plt.show()
+
 squareImages = []
 for i in range(len(squareFiles)):
     preIm = cv2.imread(os.path.join(cwd, 'Images/square/', squareFiles[i]), 0)
     height, width = preIm.shape
 
+    # applying canny edge detection
+    edged = cv2.Canny(preIm, 10, 250)
+
+    # finding contours
+    (_, cnts, _) = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    idx = 0
+    for c in cnts:
+        x, y, w, h = cv2.boundingRect(c)
+        if w > h:
+            idx += 1
+            preImg = preIm[y:y + w, x:x + w]
+        else:
+            idx += 1
+            preImg = preIm[y:y + h, x:x + h]
+            # cropping images
+            #cv2.imwrite("cropped/" + str(idx) + '.png', new_img)
+
+
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
-    if height > 80:
-        preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
+    if height < 700:
+        preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
 
     # PREPROCESSING: threshold
     preIm = threshold(preIm)
 
     squareImages.append(preIm)
 
+plt.imshow(squareImages[np.random.randint(1,500)])
+plt.show()
+
+
 triangleImages = []
 for i in range(len(triangleFiles)):
     preIm = cv2.imread(os.path.join(cwd, 'Images/triangle/', triangleFiles[i]), 0)
     height, width = preIm.shape
 
+    # applying canny edge detection
+    edged2 = cv2.Canny(preIm, 10, 250)
+
+    # finding contours
+    (_, cnts, _) = cv2.findContours(edged2.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    idx = 0
+    for c in cnts:
+        x, y, w, h = cv2.boundingRect(c)
+        if w > h:
+            idx += 1
+            preImg = preIm[y:y + w, x:x + w]
+        else:
+            idx += 1
+            preImg = preIm[y:y + h, x:x + h]
+            # cropping images
+            #cv2.imwrite("cropped/" + str(idx) + '.png', new_img)
+
+            # cropping images
+
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
-    if height > 80:
-        preIm = cv2.resize(preIm, (80, 80), interpolation=cv2.INTER_AREA)
+    if height > 10:
+        preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
 
     # PREPROCESSING: threshold
     preIm = threshold(preIm)
 
     triangleImages.append(preIm)
+
+plt.imshow(triangleImages[np.random.randint(1,500)])
+plt.show()
+
+
+#Source of "Find and Crop" function: https://github.com/imneonizer/Find-and-crop-objects-From-images-using-OpenCV-and-Python/blob/master/crop_objects.py
 
 #############################################################################################################
 
@@ -510,9 +598,9 @@ file.write("Total:\t\t%d\n" % len(y))
 file.write("-"*50)
 file.close()
 
-x, y = augment(x, y, f=0)
+x, y = augment(x, y)
 # Train, test, split the data
-x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=40, test_size=0.20, stratify=y)
+x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=40, test_size=0.20)#stratify=y)
 x_test_length = len(x_test)
 y_test_ex = y_test
 
@@ -575,7 +663,7 @@ start = timeit.default_timer()
 # Create a MLP Classifier
 clf = MLPClassifier(solver='sgd',       # MLP will converge via Stochastic Gradient Descent
                             alpha=.0001,       # alpha is convergence rate (low alpha is slow, but won't overshoot solution)
-                            hidden_layer_sizes=(10,),        # represents a 6400 - Hidden Layers - 2 MLP
+                            hidden_layer_sizes=(100,),        # represents a 6400 - Hidden Layers - 2 MLP
                             random_state=1)
 # Train the model using the training sets
 clf.fit(x_train, y_train)
@@ -596,6 +684,22 @@ print(cmx_MLP)
         # print("Classification Report MLP",":")
 cfrp = classification_report(y_test, y_pred)
 print(cfrp)
+
+# Confusion Matrix Heatmap
+class_names = np.unique(label_data)
+df_cm = pd.DataFrame(cmx_MLP, index=class_names, columns=class_names)
+plt.figure(figsize=(6, 6))
+hm = sns.heatmap(df_cm, cmap="Blues", cbar=False, annot=True, square=True, fmt='d', annot_kws={'size': 20},
+                 yticklabels=df_cm.columns, xticklabels=df_cm.columns)
+hm.yaxis.set_ticklabels(hm.yaxis.get_ticklabels(), rotation=0, ha='right', fontsize=10)
+hm.xaxis.set_ticklabels(hm.xaxis.get_ticklabels(), rotation=0, ha='right', fontsize=10)
+plt.ylabel('True label', fontsize=15)
+plt.xlabel('Predicted label', fontsize=15)
+plt.title(("MLP Classifier"))
+
+# Show heat map
+plt.tight_layout()
+plt.show()
         # print("-")
         #
         # file = open('ModelOutput.txt', 'a+')
@@ -609,6 +713,9 @@ print(cfrp)
         # file.write(f"Accuracy:\t\t{round(metrics.accuracy_score(y_test, y_pred), 3)}\n")
         # file.write("-"*50)
         # file.close()
+
+
+
 
         #clf.estimator
 '''
@@ -648,7 +755,7 @@ class DrawingPad(QtWidgets.QLabel):
         canvas.fill()
         self.setPixmap(canvas)
 
-        self.pen_width = 5
+        self.pen_width = 20
 
         self.initial_point, self.next_point = None, None
     def mouseMoveEvent(self, a):
@@ -678,7 +785,7 @@ class DrawingPad(QtWidgets.QLabel):
 
 
 WIDTHS = [
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    5, 10, 15, 20, 25, 30
 ]
 
 class QLineWidthButton(QPushButton):
@@ -753,32 +860,44 @@ class MainMenu(QMainWindow):
 
     def on_click(self):
         # self.button.setStyleSheet("border: 2px solid #000000;font: bold;background-color: blue;font-size: 20px;height: 200px;width: 500px;color: white")
-        pixmap = self.drawing_pad.pixmap().scaled(80,80, aspectRatioMode=Qt.KeepAspectRatio)
+        pixmap = self.drawing_pad.pixmap().scaled(80, 80, aspectRatioMode=Qt.KeepAspectRatio)
         pixmap.save("picture.jpg")
         im = cv2.imread(os.path.join(cwd, 'picture.jpg'), 0)
         height, width = im.shape
         print(height)
         print(width)
         # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
-        if height > 80:
-            im = cv2.resize(im, (80, 80), interpolation=cv2.INTER_AREA)
+        # applying canny edge detection
+
+        edged = cv2.Canny(im, 10, 250)
+
+        # finding contours
+        (_, cnts, _) = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        idx = 0
+        for c in cnts:
+            x, y, w, h = cv2.boundingRect(c)
+            if w > h:
+                idx += 1
+                preImg = im[y:y + w, x:x + w]
+            else:
+                idx += 1
+                preImg = im[y:y + h, x:x + h]
+                # cropping images
+                # cv2.imwrite("cropped/" + str(idx) + '.png', new_img)
+
+        # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
+        if height < 700:
+            im = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
 
         im = threshold(im)
-        im = np.reshape(im, (1,-1))
+
+        plt.imshow(im)
+        plt.show()
+
+        im = np.reshape(im, (1, -1))
         im = sc_X.transform(im)
-        print(50 * '-')
-        print(im)
-        print(50 * '-')
-        print(im.shape)
-        print(50 * '-')
-        print(im.max())
-        print(50 * '-')
         pred = clf.predict(im)
-        print(pred[0])
-        print(50*'-')
-        print(x_test)
-        print(50 * '-')
-        print(x_test.max())
+
         if pred[0] == 0:
             pred_shape = 'Circle'
         if pred[0] == 1:
@@ -796,6 +915,7 @@ class MainMenu(QMainWindow):
         msgBox.buttonClicked.connect(self.shapeButton)
         msgBox.exec()
         self.hbox.addWidget(msgBox)
+
 
     def shapeButton(self, butt):
         if butt.text() == "Yes":

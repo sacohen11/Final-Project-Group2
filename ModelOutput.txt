@@ -1,0 +1,22 @@
+Count of Total Images before Augmentation:
+Circles:		817
+Rectangles:		540
+Squares:		747
+Triangles:		639
+Total:		2743
+--------------------------------------------------
+
+Count of Total Images after Augmentation:
+Circles:		817
+Rectangles:		817
+Squares:		817
+Triangles:		817
+Total:		3268
+--------------------------------------------------
+Count of Total Training Images after Augmentation:
+Circles:		657
+Rectangles:		646
+Squares:		648
+Triangles:		663
+Total:		2614
+--------------------------------------------------
