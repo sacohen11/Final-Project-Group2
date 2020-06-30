@@ -399,9 +399,12 @@ for i in range(len(circleFiles)):
     idx = 0
     for c in cnts:
         x, y, w, h = cv2.boundingRect(c)
-        if w > 10 and h > 10:
+        if w > h:
             idx += 1
-            preImg = preIm[y:y + h, x:x + w]
+            preImg = preIm[y:y + w, x:x + w]
+        else:
+            idx += 1
+            preImg = preIm[y:y + h, x:x + h]
             # cropping images
             #cv2.imwrite("cropped/" + str(idx) + '.png', new_img)
 
@@ -413,7 +416,7 @@ for i in range(len(circleFiles)):
 
     circleImages.append(preIm)
 
-plt.imshow(circleImages[np.random.randint(1,300)])
+plt.imshow(circleImages[0])
 plt.show()
 
 rectangleImages = []
@@ -429,9 +432,15 @@ for i in range(len(rectangleFiles)):
     idx = 0
     for c in cnts:
         x, y, w, h = cv2.boundingRect(c)
-        if w > 10 and h > 10:
+        if w > h:
             idx += 1
-            preImg = preIm[y:y + h, x:x + w]
+            preImg = preIm[y:y + w, x:x + w]
+        else:
+            idx += 1
+            preImg = preIm[y:y + h, x:x + h]
+            # cropping images
+            #cv2.imwrite("cropped/" + str(idx) + '.png', new_img)
+
 
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
     if height < 700:
@@ -442,7 +451,7 @@ for i in range(len(rectangleFiles)):
 
     rectangleImages.append(preIm)
 
-plt.imshow(rectangleImages[np.random.randint(1,300)])
+plt.imshow(rectangleImages[np.random.randint(1,500)])
 plt.show()
 
 squareImages = []
@@ -458,9 +467,15 @@ for i in range(len(squareFiles)):
     idx = 0
     for c in cnts:
         x, y, w, h = cv2.boundingRect(c)
-        if w > 10 and h > 10:
+        if w > h:
             idx += 1
-            preImg = preIm[y:y + h, x:x + w]
+            preImg = preIm[y:y + w, x:x + w]
+        else:
+            idx += 1
+            preImg = preIm[y:y + h, x:x + h]
+            # cropping images
+            #cv2.imwrite("cropped/" + str(idx) + '.png', new_img)
+
 
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
     if height < 700:
@@ -471,7 +486,7 @@ for i in range(len(squareFiles)):
 
     squareImages.append(preIm)
 
-plt.imshow(squareImages[np.random.randint(1,300)])
+plt.imshow(squareImages[np.random.randint(1,500)])
 plt.show()
 
 
@@ -488,9 +503,15 @@ for i in range(len(triangleFiles)):
     idx = 0
     for c in cnts:
         x, y, w, h = cv2.boundingRect(c)
-        if w > 10 and h > 10:
+        if w > h:
             idx += 1
-            preImg = preIm[y:y + h, x:x + w]
+            preImg = preIm[y:y + w, x:x + w]
+        else:
+            idx += 1
+            preImg = preIm[y:y + h, x:x + h]
+            # cropping images
+            #cv2.imwrite("cropped/" + str(idx) + '.png', new_img)
+
             # cropping images
 
     # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
@@ -502,7 +523,7 @@ for i in range(len(triangleFiles)):
 
     triangleImages.append(preIm)
 
-plt.imshow(triangleImages[np.random.randint(1,300)])
+plt.imshow(triangleImages[np.random.randint(1,500)])
 plt.show()
 
 
@@ -857,9 +878,14 @@ class MainMenu(QMainWindow):
         idx = 0
         for c in cnts:
             x, y, w, h = cv2.boundingRect(c)
-            if w > 10 and h > 10:
+            if w > h:
                 idx += 1
-                preImg = im[y:y + h, x:x + w]
+                preImg = im[y:y + w, x:x + w]
+            else:
+                idx += 1
+                preImg = im[y:y + h, x:x + h]
+                # cropping images
+                # cv2.imwrite("cropped/" + str(idx) + '.png', new_img)
 
         # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
         if height < 700:
@@ -872,19 +898,8 @@ class MainMenu(QMainWindow):
 
         im = np.reshape(im, (1, -1))
         im = sc_X.transform(im)
-        print(50 * '-')
-        print(im)
-        print(50 * '-')
-        print(im.shape)
-        print(50 * '-')
-        print(im.max())
-        print(50 * '-')
         pred = clf.predict(im)
-        print(pred[0])
-        print(50 * '-')
-        print(x_test)
-        print(50 * '-')
-        print(x_test.max())
+
         if pred[0] == 0:
             pred_shape = 'Circle'
         if pred[0] == 1:
