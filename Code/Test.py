@@ -38,7 +38,6 @@ from sklearn import preprocessing
 import matplotlib.pyplot as plt
 import warnings
 from sklearn.preprocessing import StandardScaler
-
 warnings.filterwarnings("ignore")
 
 #::------------------------------------------------------------------------------------
@@ -51,6 +50,7 @@ def namestr(obj, namespace):
     Source: https://stackoverflow.com/questions/1538342/how-can-i-get-the-name-of-an-object-in-python
     '''
     return [name for name in namespace if namespace[name] is obj]
+
 
 def edge_detection(img):
     '''

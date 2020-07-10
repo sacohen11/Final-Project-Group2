@@ -418,6 +418,7 @@ for i in range(len(circleFiles)):
     # resize to an 80x80 image:
     preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
 
+
     # PREPROCESSING: threshold
     preIm = threshold(preIm)
 
@@ -446,10 +447,12 @@ for i in range(len(rectangleFiles)):
             #cv2.imwrite("cropped/" + str(idx) + '.png', new_img)
 
 
+
     # resize to an 80x80 image:
     preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
 
     # PREPROCESSING: set all pixel values by a threshold
+
     preIm = threshold(preIm)
 
     rectangleImages.append(preIm)
@@ -475,6 +478,7 @@ for i in range(len(squareFiles)):
             preImg = preIm[y:y + h, x:x + h]
             # cropping images
             #cv2.imwrite("cropped/" + str(idx) + '.png', new_img)
+
 
 
     # resize to an 80x80 image:
@@ -572,6 +576,7 @@ print("Triangles:", count[3])
 print("Total:", len(y))
 print("-" * 50)
 
+#::---------------------------------------------------------------------------------
 ## Create a .txt output of model precursors and results
 #::---------------------------------------------------------------------------------
 # Generate a count of all classes in the total dataset before augmentation
@@ -596,7 +601,6 @@ y_test_ex = y_test
 # Convert target classes to categorical ones for keras modeling
 y_train_ker = to_categorical(y_train, len(unique))
 y_test_ker = to_categorical(y_test, len(unique))
-
 
 #x_train, y_train = augment(x_train, y_train, f=0)
 print("Data augmentation completed.")
@@ -641,7 +645,7 @@ sc_X = StandardScaler()
 x_train = sc_X.fit_transform(x_train)
 x_test = sc_X.transform(x_test)
 
-'''
+
 #::------------------------------------------------------------------------------------
 # SKLearn Multi-Layer Perceptron
 #::------------------------------------------------------------------------------------
@@ -649,10 +653,12 @@ x_test = sc_X.transform(x_test)
 # Provide a start timer for MLP run
 start = timeit.default_timer()
 # Create a MLP Classifier
+
 clf = MLPClassifier(solver='sgd',               # MLP will converge via Stochastic Gradient Descent
                             alpha=0.0001,        # alpha is convergence rate (low alpha is slow, but won't overshoot solution)
                             hidden_layer_sizes=(100,),        # represents a 6400 - 100 - 2 MLP
                             random_state=1)
+
 # Train the model using the training sets
 modelPred = clf.fit(x_train, y_train)
 # Predict the response for test dataset
@@ -689,6 +695,7 @@ plt.title(("MLP Classifier"))
 plt.tight_layout()
 plt.show()
 
+
 file = open('ModelOutput.txt', 'a+')
 file.write('\nSKLearn Multi-Layer Perceptron Metrics:\n')
 file.write("Descent Model:\t\tStochastic Gradient\n")
@@ -704,7 +711,7 @@ file.close()
 
 # save the model to disk
 joblib.dump(modelPred, 'model_skl.pkl')
-'''
+
 #::------------------------------------------------------------------------------------
 # Keras Multi-Layer Perceptron
 # Source for original Keras modeling:
