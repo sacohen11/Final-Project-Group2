@@ -47,6 +47,17 @@ from sklearn.metrics import classification_report
 import pandas as pd
 from sklearn.neural_network import MLPClassifier
 import timeit                  # Used for determining processing time for MLP
+
+# For Keras Modeling
+import tensorflow as tf
+from tensorflow import keras
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers import Conv2D
+from keras.layers import MaxPooling2D
+from keras.layers import Flatten
+from keras.utils import to_categorical
+
 warnings.filterwarnings("ignore")
 
 #::------------------------------------------------------------------------------------
@@ -404,16 +415,14 @@ for i in range(len(circleFiles)):
             # cropping images
             #cv2.imwrite("cropped/" + str(idx) + '.png', new_img)
 
-    if height < 700:
-        preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
+    # resize to an 80x80 image:
+    preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
+
 
     # PREPROCESSING: threshold
     preIm = threshold(preIm)
 
     circleImages.append(preIm)
-
-plt.imshow(circleImages[0])
-plt.show()
 
 rectangleImages = []
 for i in range(len(rectangleFiles)):
@@ -438,17 +447,15 @@ for i in range(len(rectangleFiles)):
             #cv2.imwrite("cropped/" + str(idx) + '.png', new_img)
 
 
-    # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
-    if height < 700:
-        preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
 
-    # PREPROCESSING: threshold
+    # resize to an 80x80 image:
+    preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
+
+    # PREPROCESSING: set all pixel values by a threshold
+
     preIm = threshold(preIm)
 
     rectangleImages.append(preIm)
-
-plt.imshow(rectangleImages[np.random.randint(1,500)])
-plt.show()
 
 squareImages = []
 for i in range(len(squareFiles)):
@@ -473,18 +480,14 @@ for i in range(len(squareFiles)):
             #cv2.imwrite("cropped/" + str(idx) + '.png', new_img)
 
 
-    # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
-    if height < 700:
-        preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
+
+    # resize to an 80x80 image:
+    preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
 
     # PREPROCESSING: threshold
     preIm = threshold(preIm)
 
     squareImages.append(preIm)
-
-plt.imshow(squareImages[np.random.randint(1,500)])
-plt.show()
-
 
 triangleImages = []
 for i in range(len(triangleFiles)):
@@ -510,18 +513,13 @@ for i in range(len(triangleFiles)):
 
             # cropping images
 
-    # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
-    if height > 10:
-        preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
+    # resize to an 80x80 image:
+    preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
 
     # PREPROCESSING: threshold
     preIm = threshold(preIm)
 
     triangleImages.append(preIm)
-
-plt.imshow(triangleImages[np.random.randint(1,500)])
-plt.show()
-
 
 #Source of "Find and Crop" function: https://github.com/imneonizer/Find-and-crop-objects-From-images-using-OpenCV-and-Python/blob/master/crop_objects.py
 
@@ -541,7 +539,6 @@ npTrig, npTrigLab = np.array(triangleImages), np.array(['triangle']*len(triangle
 ##PREPROCESSING
 #::------------------------------------------------------------------------------------
 
-
 print("Starting image and label pre-processing...")
 
 print("-"*50)
@@ -549,7 +546,6 @@ print("-"*50)
 # look at labels and images shape
 label_data = np.append(npCircLab, np.append(npRectLab, np.append(npSqurLab, npTrigLab)))
 print("Labels shape:", label_data.shape)
-
 
 #One-hot encoding: Convert text-based labels to numbers
 le = preprocessing.LabelEncoder()
@@ -602,6 +598,9 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=40, test_
 x_test_length = len(x_test)
 y_test_ex = y_test
 
+# Convert target classes to categorical ones for keras modeling
+y_train_ker = to_categorical(y_train, len(unique))
+y_test_ker = to_categorical(y_test, len(unique))
 
 #x_train, y_train = augment(x_train, y_train, f=0)
 print("Data augmentation completed.")
@@ -646,23 +645,20 @@ sc_X = StandardScaler()
 x_train = sc_X.fit_transform(x_train)
 x_test = sc_X.transform(x_test)
 
-#::------------------------------------------------------------------------------------
-# Multi-Layer Perceptron
-#::------------------------------------------------------------------------------------
-hiddenLayers = (20, 50)#, 20)
-alphaValues = (0.0001, 0.0010)
 
-
-#for alpha1 in alphaValues:
-    #for hidLay in hiddenLayers:
+#::------------------------------------------------------------------------------------
+# SKLearn Multi-Layer Perceptron
+#::------------------------------------------------------------------------------------
 
 # Provide a start timer for MLP run
 start = timeit.default_timer()
 # Create a MLP Classifier
-clf = MLPClassifier(solver='sgd',       # MLP will converge via Stochastic Gradient Descent
-                            alpha=.0001,       # alpha is convergence rate (low alpha is slow, but won't overshoot solution)
-                            hidden_layer_sizes=(100,),        # represents a 6400 - Hidden Layers - 2 MLP
+
+clf = MLPClassifier(solver='sgd',               # MLP will converge via Stochastic Gradient Descent
+                            alpha=0.0001,        # alpha is convergence rate (low alpha is slow, but won't overshoot solution)
+                            hidden_layer_sizes=(100,),        # represents a 6400 - 100 - 2 MLP
                             random_state=1)
+
 # Train the model using the training sets
 modelPred = clf.fit(x_train, y_train)
 # Predict the response for test dataset
@@ -698,27 +694,127 @@ plt.title(("MLP Classifier"))
 # Show heat map
 plt.tight_layout()
 plt.show()
-        # print("-")
-        #
-        # file = open('ModelOutput.txt', 'a+')
-        # file.write('\nMulti-Layer Perceptron Metrics:\n')
-        # file.write("Descent Model:\t\tStochastic Gradient\n")
-        # file.write(f"Alpha:\t\t\t\t{alpha1}\n")
-        # file.write(f"Hidden Layers:\t\t\t{hidLay}\n")
-        # file.write("-"*50)
-        # file.write('\n\nMulti-Layer Perceptron Performance:\n')
-        # file.write(f"Run Time:\t\t{stop-start} seconds\n")
-        # file.write(f"Accuracy:\t\t{round(metrics.accuracy_score(y_test, y_pred), 3)}\n")
-        # file.write("-"*50)
-        # file.close()
+
+
+file = open('ModelOutput.txt', 'a+')
+file.write('\nSKLearn Multi-Layer Perceptron Metrics:\n')
+file.write("Descent Model:\t\tStochastic Gradient\n")
+file.write(f"Alpha:\t\t\t\t0.0001\n")
+file.write(f"1st Hidden Layer Neurons:\t\t100\n")
+file.write("-"*50)
+file.write('\n\nMulti-Layer Perceptron Performance:\n')
+file.write(f"Run Time:\t\t{stop-start} seconds\n")
+file.write(f"Accuracy:\t\t{round(metrics.accuracy_score(y_test, y_pred), 3)}\n")
+file.write("-"*50)
+file.close()
 
 
 # save the model to disk
-joblib.dump(modelPred, 'model.pkl')
+joblib.dump(modelPred, 'model_skl.pkl')
 
+#::------------------------------------------------------------------------------------
+# Keras Multi-Layer Perceptron
+# Source for original Keras modeling:
+# https://www.machinecurve.com/index.php/2019/07/27/how-to-create-a-basic-mlp-classifier-with-the-keras-sequential-api/
+# https://keras.io/api/models/model/
+#::------------------------------------------------------------------------------------
 
-# Source: https://www.datacamp.com/community/tutorials/svm-classification-scikit-learn-python
+# Cannot reshape if using Keras Conv2D Layer
+# Reshape the image data into rows
+x_train = np.reshape(x_train, (len(y_train), 80, 80, 1))
+print('Keras Training data shape', namestr(x, globals())[0],":", x_train.shape)
+x_test = np.reshape(x_test, (len(y_test), 80, 80, 1))
+print('Keras Test data shape', namestr(x, globals())[0],":", x_test.shape)
 
-##################
-# Sources #
+plt.imshow(circleImages[0])
+plt.show()
+
+plt.imshow(rectangleImages[np.random.randint(1,100)])
+plt.show()
+
+# Provide a start timer for MLP run
+start = timeit.default_timer()
+
+# Create a Keras MLP Classifier
+model = Sequential()        # Create a Keras Sequential API
+
+# FIRST KERAS LAYER:
+# Create the first layer with 32 filters (standard) and a 3x3 kernel size since the images are relatively small (<128)
+# Need to specify input shape of the data in the first layer of the MLP
+# Padding is set to 'same' to keep spatial dimensions of the output equal to the input
+model.add(Conv2D(32, (3, 3), padding="same", input_shape=(80,80,1), activation="relu"))
+model.add(MaxPooling2D(pool_size=(2, 2)))       # Reduces output dimensions
+
+# SECOND KERAS LAYER:
+# Create the second layer with 64 filters (increasing) and a 3x3 kernel size since the images are relatively small
+model.add(Conv2D(64, (3, 3), padding="same", activation="relu"))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+# THIRD KERAS LAYER:
+# Create the third layer with 128 filters (increasing) and a 3x3 kernel size since the images are relatively small
+model.add(Conv2D(128, (3, 3), padding="same", activation="relu"))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+# fully-connected layer flattening the data
+model.add(Flatten())
+model.add(Dense(512, activation = "relu"))
+# Step classifier to produce a single classification output
+model.add(Dense(1, activation='relu'))
+print(model.layers)
+print(y_train[0])
+print(y_test_ker.shape)
+
+# Configure the model and start training
+model.compile(loss='mse', optimizer='sgd', metrics=['accuracy'])
+model.fit(x_train, y_train, epochs=15, batch_size=100, verbose=1, validation_split=0.2)
+
+# Predict the response for test dataset
+y_pred = model.predict(x_test)
+# round outputs of model to nearest classification and clip so no values are above 3 or below 0
+y_pred = np.around(y_pred)
+y_pred = np.clip(y_pred, 0, 3)
+
+print(y_pred[0])
+print(y_test[0])
+# Provide a stop timer for MLP run
+stop = timeit.default_timer()
+
+print("Accuracy of MLP:", round(metrics.accuracy_score(y_test, y_pred), 3))
+cmx_MLP = confusion_matrix(y_test, y_pred)
+print(cmx_MLP)
+
+cfrp = classification_report(y_test, y_pred)
+print(cfrp)
+
+# Confusion Matrix Heatmap
+class_names = np.unique(label_data)
+df_cm = pd.DataFrame(cmx_MLP, index=class_names, columns=class_names)
+plt.figure(figsize=(6, 6))
+hm = sns.heatmap(df_cm, cmap="Blues", cbar=False, annot=True, square=True, fmt='d', annot_kws={'size': 20},
+                 yticklabels=df_cm.columns, xticklabels=df_cm.columns)
+hm.yaxis.set_ticklabels(hm.yaxis.get_ticklabels(), rotation=0, ha='right', fontsize=10)
+hm.xaxis.set_ticklabels(hm.xaxis.get_ticklabels(), rotation=0, ha='right', fontsize=10)
+plt.ylabel('True label', fontsize=15)
+plt.xlabel('Predicted label', fontsize=15)
+plt.title(("Keras MLP Classifier"))
+
+# Show heat map
+plt.tight_layout()
+plt.show()
+
+file = open('ModelOutput.txt', 'a+')
+file.write('\nKeras Multi-Layer Perceptron Metrics:\n')
+file.write(f"1st Hidden Layer Neurons:\t\t100\n")
+file.write("-"*50)
+file.write('\n\nMulti-Layer Perceptron Performance:\n')
+file.write(f"Run Time:\t\t{stop-start} seconds\n")
+file.write(f"Accuracy:\t\t{round(metrics.accuracy_score(y_test, y_pred), 3)}\n")
+file.write("-"*50)
+file.close()
+
+# save the model to disk
+joblib.dump(model, 'model_keras.pkl')
+
+# Sources:
+# https://www.datacamp.com/community/tutorials/svm-classification-scikit-learn-python
 # https://www.learnpyqt.com/courses/custom-widgets/bitmap-graphics/

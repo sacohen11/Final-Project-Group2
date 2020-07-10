@@ -19,4 +19,13 @@ Rectangles:		657
 Squares:		678
 Triangles:		648
 Total:		2649
+
+--------------------------------------------------
+Keras Multi-Layer Perceptron Metrics:
+1st Hidden Layer Neurons:		100
+--------------------------------------------------
+
+Multi-Layer Perceptron Performance:
+Run Time:		439.2864867 seconds
+Accuracy:		0.777
 --------------------------------------------------
