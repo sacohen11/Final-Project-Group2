@@ -38,6 +38,7 @@ from sklearn import preprocessing
 import matplotlib.pyplot as plt
 import warnings
 from sklearn.preprocessing import StandardScaler
+from sklearn.neural_network import MLPClassifier
 
 warnings.filterwarnings("ignore")
 
@@ -81,7 +82,7 @@ os.chdir('..')
 cwd = os.getcwd()
 
 # Standardizing the features
-sc_X = StandardScaler()
+sc_X = joblib.load("sc_X.pkl")
 
 ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### ---
 # PQT Code:
@@ -236,7 +237,7 @@ class MainMenu(QMainWindow):
         im = np.reshape(im, (1, -1))
 
         # load the model from disk
-        classifier = joblib.load("model.pkl")
+        classifier = joblib.load("model_skl.pkl")
 
         # Standardizing the features
         im = sc_X.transform(im)

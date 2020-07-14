@@ -50,12 +50,16 @@ import timeit                  # Used for determining processing time for MLP
 
 # For Keras Modeling
 import tensorflow as tf
-from tensorflow import keras
+from keras.initializers import glorot_uniform
+from keras.optimizers import Adam
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import Conv2D
 from keras.layers import MaxPooling2D
 from keras.layers import Flatten
+from keras.layers import BatchNormalization
+from keras.layers import Activation
+from keras.layers import Dropout
 from keras.utils import to_categorical
 
 warnings.filterwarnings("ignore")
@@ -641,6 +645,8 @@ sc_X = StandardScaler()
 x_train = sc_X.fit_transform(x_train)
 x_test = sc_X.transform(x_test)
 
+# Save the fitted scalar object for the Test case
+joblib.dump(sc_X, 'sc_X.pkl')
 '''
 #::------------------------------------------------------------------------------------
 # SKLearn Multi-Layer Perceptron
@@ -706,8 +712,75 @@ file.close()
 joblib.dump(modelPred, 'model_skl.pkl')
 '''
 #::------------------------------------------------------------------------------------
-# Keras Multi-Layer Perceptron
-# Source for original Keras modeling:
+# Keras Multi-Layer Perceptron Model Flat:
+# Source for original Keras Model Flat:
+# https://github.com/amir-jafari/Deep-Learning/blob/master/Keras_/MLP/3_ImageClassification/example_MNIST.py
+#::------------------------------------------------------------------------------------
+
+# Do not need to reshape if using Keras Dense Layer
+
+# Provide a start timer for MLP run
+start = timeit.default_timer()
+
+# %% --------------------------------------- Set-Up --------------------------------------------------------------------
+# Sets random seeds and some other stuff for reproducibility. Note even this might not give fully reproducible results.
+# There seems to be a problem with the TF backend. However, the results should be very similar.
+SEED = 42
+os.environ['PYTHONHASHSEED'] = str(SEED)
+random.seed(SEED)
+np.random.seed(SEED)
+tf.random.set_seed(SEED)
+weight_init = glorot_uniform(seed=SEED)
+
+# %% ----------------------------------- Hyper Parameters --------------------------------------------------------------
+LR = 1e-3
+N_NEURONS = (100, 200, 100)
+N_EPOCHS = 20
+BATCH_SIZE = 512
+DROPOUT = 0.2
+
+# %% -------------------------------------- Training Prep ----------------------------------------------------------
+model = Sequential([  # The dropout is placed right after the outputs of the hidden layers.
+    Dense(N_NEURONS[0], input_dim=6400, kernel_initializer=weight_init),  # This sets some of these outputs to 0, so that
+    Activation("relu"),  # a random dropout % of the hidden neurons are not used during each training step,
+    Dropout(DROPOUT),  # nor are they updated. The Batch Normalization normalizes the outputs from the hidden
+    BatchNormalization()  # activation functions. This helps with neuron imbalance and can speed training significantly.
+])  # Note this is an actual layer with some learnable parameters. It's not just min-maxing or standardizing.
+# Loops over the hidden dims to add more layers
+for n_neurons in N_NEURONS[1:]:
+    model.add(Dense(n_neurons, activation="relu", kernel_initializer=weight_init))
+    model.add(Dropout(DROPOUT, seed=SEED))
+    model.add(BatchNormalization())
+# Adds a final output layer with softmax to map to the 4 classes
+model.add(Dense(4, activation="softmax", kernel_initializer=weight_init))
+model.compile(optimizer=Adam(lr=LR), loss="categorical_crossentropy", metrics=["accuracy"])
+
+# %% -------------------------------------- Training Loop ----------------------------------------------------------
+# Trains the MLP, while printing validation loss and metrics at each epoch
+model.fit(x_train, y_train_ker, batch_size=BATCH_SIZE, epochs=N_EPOCHS, validation_data=(x_test, y_test_ker))
+
+# Check final model output
+print("Final accuracy on validations set:", 100*model.evaluate(x_test, y_test_ker)[1], "%")
+
+# Provide a stop timer for MLP run
+stop = timeit.default_timer()
+
+file = open('ModelOutput.txt', 'a+')
+file.write('\nKeras Multi-Layer Perceptron Metrics:\n')
+file.write(f"1st Hidden Layer Neurons:\t\t100\n")
+file.write("-"*50)
+file.write('\n\nMulti-Layer Perceptron Performance:\n')
+file.write(f"Run Time:\t\t{stop-start} seconds\n")
+file.write(f"Accuracy:\t\t{100*model.evaluate(x_test, y_test_ker)[1]}\n")
+file.write("-"*50)
+file.close()
+
+# save the model to disk
+joblib.dump(model, 'model_keras_flat.pkl')
+
+#::------------------------------------------------------------------------------------
+# Keras Multi-Layer Perceptron Model 2D:
+# Source for original Keras Model 2D:
 # https://www.machinecurve.com/index.php/2019/07/27/how-to-create-a-basic-mlp-classifier-with-the-keras-sequential-api/
 # https://keras.io/api/models/model/
 #::------------------------------------------------------------------------------------
@@ -759,7 +832,7 @@ print(y_test_ker.shape)
 
 # Configure the model and start training
 model.compile(loss='mse', optimizer='sgd', metrics=['accuracy'])
-model.fit(x_train, y_train, epochs=15, batch_size=100, verbose=1, validation_split=0.2)
+model.fit(x_train, y_train, epochs=15, batch_size=100, verbose=1, validation_data=(x_test, y_test))
 
 # Predict the response for test dataset
 y_pred = model.predict(x_test)
@@ -806,7 +879,9 @@ file.write("-"*50)
 file.close()
 
 # save the model to disk
-joblib.dump(model, 'model_keras.pkl')
+joblib.dump(model, 'model_keras_2D.pkl')
+
+
 
 # Sources:
 # https://www.datacamp.com/community/tutorials/svm-classification-scikit-learn-python
