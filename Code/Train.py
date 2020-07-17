@@ -718,103 +718,103 @@ joblib.dump(modelPred, 'model_skl.pkl')
 # https://www.machinecurve.com/index.php/2019/07/27/how-to-create-a-basic-mlp-classifier-with-the-keras-sequential-api/
 # https://keras.io/api/models/model/
 #::------------------------------------------------------------------------------------
-
-# Cannot reshape if using Keras Conv2D Layer
-# Reshape the image data into rows
-x_train = np.reshape(x_train, (len(y_train), 80, 80, 1))
-print('Keras Training data shape', namestr(x, globals())[0],":", x_train.shape)
-x_test = np.reshape(x_test, (len(y_test), 80, 80, 1))
-print('Keras Test data shape', namestr(x, globals())[0],":", x_test.shape)
-
-plt.imshow(circleImages[0])
-plt.show()
-
-plt.imshow(rectangleImages[np.random.randint(1,100)])
-plt.show()
-
-# Provide a start timer for MLP run
-start = timeit.default_timer()
-
-# Create a Keras MLP Classifier
-model = Sequential()        # Create a Keras Sequential API
-
-# FIRST KERAS LAYER:
-# Create the first layer with 32 filters (standard) and a 3x3 kernel size since the images are relatively small (<128)
-# Need to specify input shape of the data in the first layer of the MLP
-# Padding is set to 'same' to keep spatial dimensions of the output equal to the input
-model.add(Conv2D(32, (3, 3), padding="same", input_shape=(80,80,1), activation="relu"))
-model.add(MaxPooling2D(pool_size=(2, 2)))       # Reduces output dimensions
-
-# SECOND KERAS LAYER:
-# Create the second layer with 64 filters (increasing) and a 3x3 kernel size since the images are relatively small
-model.add(Conv2D(64, (3, 3), padding="same", activation="relu"))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-
-# THIRD KERAS LAYER:
-# Create the third layer with 128 filters (increasing) and a 3x3 kernel size since the images are relatively small
-model.add(Conv2D(128, (3, 3), padding="same", activation="relu"))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-
-# fully-connected layer flattening the data
-model.add(Flatten())
-model.add(Dense(512, activation = "relu"))
-# Step classifier to produce a single classification output
-model.add(Dense(1, activation='relu'))
-print(model.layers)
-print(y_train[0])
-print(y_test_ker.shape)
-
-# Configure the model and start training
-model.compile(loss='mse', optimizer='sgd', metrics=['accuracy'])
-model.fit(x_train, y_train, epochs=15, batch_size=100, verbose=1, validation_split=0.2)
-
-# Predict the response for test dataset
-y_pred = model.predict(x_test)
-# round outputs of model to nearest classification and clip so no values are above 3 or below 0
-y_pred = np.around(y_pred)
-y_pred = np.clip(y_pred, 0, 3)
-
-print(y_pred[0])
-print(y_test[0])
-# Provide a stop timer for MLP run
-stop = timeit.default_timer()
-
-print("Accuracy of MLP:", round(metrics.accuracy_score(y_test, y_pred), 3))
-cmx_MLP = confusion_matrix(y_test, y_pred)
-print(cmx_MLP)
-
-cfrp = classification_report(y_test, y_pred)
-print(cfrp)
-
-# Confusion Matrix Heatmap
-class_names = np.unique(label_data)
-df_cm = pd.DataFrame(cmx_MLP, index=class_names, columns=class_names)
-plt.figure(figsize=(6, 6))
-hm = sns.heatmap(df_cm, cmap="Blues", cbar=False, annot=True, square=True, fmt='d', annot_kws={'size': 20},
-                 yticklabels=df_cm.columns, xticklabels=df_cm.columns)
-hm.yaxis.set_ticklabels(hm.yaxis.get_ticklabels(), rotation=0, ha='right', fontsize=10)
-hm.xaxis.set_ticklabels(hm.xaxis.get_ticklabels(), rotation=0, ha='right', fontsize=10)
-plt.ylabel('True label', fontsize=15)
-plt.xlabel('Predicted label', fontsize=15)
-plt.title(("Keras MLP Classifier"))
-
-# Show heat map
-plt.tight_layout()
-plt.show()
-
-file = open('ModelOutput.txt', 'a+')
-file.write('\nKeras Multi-Layer Perceptron Metrics:\n')
-file.write(f"1st Hidden Layer Neurons:\t\t100\n")
-file.write("-"*50)
-file.write('\n\nMulti-Layer Perceptron Performance:\n')
-file.write(f"Run Time:\t\t{stop-start} seconds\n")
-file.write(f"Accuracy:\t\t{round(metrics.accuracy_score(y_test, y_pred), 3)}\n")
-file.write("-"*50)
-file.close()
-
-# save the model to disk
-joblib.dump(model, 'model_keras.pkl')
-
-# Sources:
-# https://www.datacamp.com/community/tutorials/svm-classification-scikit-learn-python
-# https://www.learnpyqt.com/courses/custom-widgets/bitmap-graphics/
+#
+# # Cannot reshape if using Keras Conv2D Layer
+# # Reshape the image data into rows
+# x_train = np.reshape(x_train, (len(y_train), 80, 80, 1))
+# print('Keras Training data shape', namestr(x, globals())[0],":", x_train.shape)
+# x_test = np.reshape(x_test, (len(y_test), 80, 80, 1))
+# print('Keras Test data shape', namestr(x, globals())[0],":", x_test.shape)
+#
+# plt.imshow(circleImages[0])
+# plt.show()
+#
+# plt.imshow(rectangleImages[np.random.randint(1,100)])
+# plt.show()
+#
+# # Provide a start timer for MLP run
+# start = timeit.default_timer()
+#
+# # Create a Keras MLP Classifier
+# model = Sequential()        # Create a Keras Sequential API
+#
+# # FIRST KERAS LAYER:
+# # Create the first layer with 32 filters (standard) and a 3x3 kernel size since the images are relatively small (<128)
+# # Need to specify input shape of the data in the first layer of the MLP
+# # Padding is set to 'same' to keep spatial dimensions of the output equal to the input
+# model.add(Conv2D(32, (3, 3), padding="same", input_shape=(80,80,1), activation="relu"))
+# model.add(MaxPooling2D(pool_size=(2, 2)))       # Reduces output dimensions
+#
+# # SECOND KERAS LAYER:
+# # Create the second layer with 64 filters (increasing) and a 3x3 kernel size since the images are relatively small
+# model.add(Conv2D(64, (3, 3), padding="same", activation="relu"))
+# model.add(MaxPooling2D(pool_size=(2, 2)))
+#
+# # THIRD KERAS LAYER:
+# # Create the third layer with 128 filters (increasing) and a 3x3 kernel size since the images are relatively small
+# model.add(Conv2D(128, (3, 3), padding="same", activation="relu"))
+# model.add(MaxPooling2D(pool_size=(2, 2)))
+#
+# # fully-connected layer flattening the data
+# model.add(Flatten())
+# model.add(Dense(512, activation = "relu"))
+# # Step classifier to produce a single classification output
+# model.add(Dense(1, activation='relu'))
+# print(model.layers)
+# print(y_train[0])
+# print(y_test_ker.shape)
+#
+# # Configure the model and start training
+# model.compile(loss='mse', optimizer='sgd', metrics=['accuracy'])
+# model.fit(x_train, y_train, epochs=15, batch_size=100, verbose=1, validation_split=0.2)
+#
+# # Predict the response for test dataset
+# y_pred = model.predict(x_test)
+# # round outputs of model to nearest classification and clip so no values are above 3 or below 0
+# y_pred = np.around(y_pred)
+# y_pred = np.clip(y_pred, 0, 3)
+#
+# print(y_pred[0])
+# print(y_test[0])
+# # Provide a stop timer for MLP run
+# stop = timeit.default_timer()
+#
+# print("Accuracy of MLP:", round(metrics.accuracy_score(y_test, y_pred), 3))
+# cmx_MLP = confusion_matrix(y_test, y_pred)
+# print(cmx_MLP)
+#
+# cfrp = classification_report(y_test, y_pred)
+# print(cfrp)
+#
+# # Confusion Matrix Heatmap
+# class_names = np.unique(label_data)
+# df_cm = pd.DataFrame(cmx_MLP, index=class_names, columns=class_names)
+# plt.figure(figsize=(6, 6))
+# hm = sns.heatmap(df_cm, cmap="Blues", cbar=False, annot=True, square=True, fmt='d', annot_kws={'size': 20},
+#                  yticklabels=df_cm.columns, xticklabels=df_cm.columns)
+# hm.yaxis.set_ticklabels(hm.yaxis.get_ticklabels(), rotation=0, ha='right', fontsize=10)
+# hm.xaxis.set_ticklabels(hm.xaxis.get_ticklabels(), rotation=0, ha='right', fontsize=10)
+# plt.ylabel('True label', fontsize=15)
+# plt.xlabel('Predicted label', fontsize=15)
+# plt.title(("Keras MLP Classifier"))
+#
+# # Show heat map
+# plt.tight_layout()
+# plt.show()
+#
+# file = open('ModelOutput.txt', 'a+')
+# file.write('\nKeras Multi-Layer Perceptron Metrics:\n')
+# file.write(f"1st Hidden Layer Neurons:\t\t100\n")
+# file.write("-"*50)
+# file.write('\n\nMulti-Layer Perceptron Performance:\n')
+# file.write(f"Run Time:\t\t{stop-start} seconds\n")
+# file.write(f"Accuracy:\t\t{round(metrics.accuracy_score(y_test, y_pred), 3)}\n")
+# file.write("-"*50)
+# file.close()
+#
+# # save the model to disk
+# joblib.dump(model, 'model_keras.pkl')
+#
+# # Sources:
+# # https://www.datacamp.com/community/tutorials/svm-classification-scikit-learn-python
+# # https://www.learnpyqt.com/courses/custom-widgets/bitmap-graphics/
