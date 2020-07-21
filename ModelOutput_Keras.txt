@@ -1,0 +1,29 @@
+Count of Total Images before Augmentation:
+Circles:		829
+Rectangles:		547
+Squares:		762
+Triangles:		648
+Total:		2786
+--------------------------------------------------
+
+Count of Total Images after Augmentation:
+Circles:		829
+Rectangles:		829
+Squares:		829
+Triangles:		829
+Total:		3316
+--------------------------------------------------
+Count of Total Training Images after Augmentation:
+Circles:		667
+Rectangles:		656
+Squares:		662
+Triangles:		667
+Total:		2652
+--------------------------------------------------
+Keras Multi-Layer 2D Perceptron Metrics:
+3 2D-Layers with 32, 64, and 128 filters1 Dense Layer with 512 filtersOutput:	a 4D vector output--------------------------------------------------
+
+Multi-Layer 2D Perceptron Performance:
+Run Time:		913.2214889 seconds
+Accuracy:		90.512
+--------------------------------------------------
