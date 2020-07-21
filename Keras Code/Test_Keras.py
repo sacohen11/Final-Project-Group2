@@ -36,8 +36,18 @@ import joblib
 
 from sklearn import preprocessing
 import matplotlib.pyplot as plt
+import random
 import warnings
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn import metrics
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import classification_report
+import pandas as pd
+from sklearn.neural_network import MLPClassifier
+import timeit                  # Used for determining processing time for MLP
 warnings.filterwarnings("ignore")
 
 # For Keras Modeling
@@ -64,6 +74,154 @@ def namestr(obj, namespace):
     '''
     return [name for name in namespace if namespace[name] is obj]
 
+def sp_noise(image, prob):
+    '''
+    Add salt and pepper noise to a grey-scale image (i.e., randomly change pixels to 0 or 255 intensity)
+    prob: Probability of the noise (prob = 1 will cause function to return a complete noise, black-and-white image)
+    Source: https://stackoverflow.com/questions/22937589/how-to-add-noise-gaussian-salt-and-pepper-etc-to-image-in-python-with-opencv
+    '''
+    output = np.zeros(image.shape, np.uint8)
+    # For every pixel in the image (containing only a single value 0 to 255):
+    for i in range(image.shape[0]):
+        for j in range(image.shape[1]):
+            # generate a random number [0, 1)
+            rdn = random.random()
+            # if the number is less than the probability, the pixel will change to either black or white
+            if rdn < prob:
+                if rdn < prob/2:
+                    output[i][j] = 0
+                else:
+                    output[i][j] = 255
+            else:
+                output[i][j] = image[i][j]
+    return output
+
+def augment (x_train, y_train, f = 0):
+    '''
+    Generate new images of minority classes via augmentation to a minimum value of "f"
+    "f" defaults to the maximum count of any class, unless specified, so all classes have equal representation in model.
+    New images are either rotated 90, rotated 180, flipped, switched or noised.
+    This function requires that the x_train and y_train arrays are symmetrical (i.e., tied to each other) and sorted
+    according to the classes in y_train.
+    '''
+
+    # Generate a count of all classes in the presented, training dataset
+    unique, count = np.unique(y_train, return_counts=True)
+
+    print("Training set:")
+    print("Circles:", count[0])
+    print("Rectangles:", count[1])
+    print("Squares:", count[2])
+    print("Triangles:", count[3])
+    print("Total:", len(y_train))
+    print("-"*50)
+
+    print("Data Augmentation...")
+    x_train_new = []
+    y_train_new = []
+
+    # If "f" is unspecified, set it to the maximum count of any particular class so that each class is represented
+    # equally
+    if f == 0:
+        f = max(count)
+
+    print("-"*50)
+    # For each class ('circle', 'rectangle', 'square', or 'triangle'):
+    for i in range(len(unique)):
+        # If the count of any class is below the minimum:
+        if count[i] < f:
+            # k is the iterable for a while loop; k needs to start at the index of the first instance of each class
+            k = np.where(y_train == unique[i])[0][0]
+            print(k)
+            while count[y_train[k]] < f:
+                # Randomly choose one of five options for image augmentation:
+                rn = random.randint(0,4)
+                if rn == 0:
+                    '''
+                    Flip the image along the Y-axis
+                    '''
+                    x_temp = np.fliplr(x_train[k])
+                    # print("Flipped", y_train[k])
+                    # plt.imshow(x_train[k])
+                    # plt.show()
+
+                elif rn ==1:
+                    '''
+                    Adds noise to an image
+                    '''
+                    x_temp = sp_noise(x_train[k], 0.01)
+                    # print("Noised", y_train[k])
+                    # plt.imshow(x_train[k])
+                    # plt.show()
+
+
+                elif rn ==2:
+                    '''
+                    Rotates 90 degrees
+                    Source: https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
+                    '''
+                    rows, cols = x_train[k].shape[:2]
+                    M = cv2.getRotationMatrix2D((cols / 2, rows / 2), 90, 1)
+                    x_temp = cv2.warpAffine(x_train[k], M, (cols, rows))
+                    # print("Rotated 30", y_train[k])
+                    # plt.imshow(x_train[k])
+                    # plt.show()
+
+
+                elif rn == 3:
+                    '''
+                    Translation of image
+                    Source: http: // wiki.lofarolabs.com / index.php / Translation_of_image
+                    '''
+                    # shifting the image 100 pixels in both dimensions
+                    rows, cols = x_train[k].shape[:2]
+                    M = np.float32([[1, 0, -5], [0, 1, -5]])
+                    x_temp = cv2.warpAffine(x_train[k], M, (cols, rows))
+                    # print("Shifted", y_train[k])
+                    # plt.imshow(x_train[k])
+                    # plt.show()
+
+
+                elif rn == 4:
+                    '''
+                    Rotates in 180 degrees
+                    Source: https://www.programcreek.com/python/example/89459/cv2.getRotationMatrix2D
+                    '''
+                    rows, cols = x_train[k].shape[:2]
+                    M = cv2.getRotationMatrix2D((cols / 2, rows / 2), 180, 1)
+                    x_temp = cv2.warpAffine(x_train[k], M, (cols, rows))
+                    # print("Rotated 180", y_train[k])
+                    # plt.imshow(x_train[k])
+                    # plt.show()
+
+                x_train_new.append(x_temp)
+                # print("New image saved as:", y_train[k])
+                y_train_new.append(y_train[k])
+                # print("Labeled as:", y_train[k])
+                count[y_train[k]] += 1
+                # print("-" * 50)
+
+                # if the k iterable reaches the end of the indexes of x_train without the count of the class reaching
+                # f, reset k to initial (and begin going back through x_train for more augmentation), else add 1 to k.
+                if (k - np.where(y_train == unique[i])[0][0]) < count[i]:
+                    k += 1
+                else:
+                    k = np.where(y_train == unique[i])[0][0]
+
+    x_train_new = np.array(x_train_new)
+    print(x_train_new.shape, f)
+    x_train = np.append(x_train, x_train_new, axis=0)
+    y_train_new = np.array(y_train_new)
+    y_train = np.append(y_train, y_train_new, axis=0)
+
+    print("Training set after data augmentation:")
+    print("Circles:", count[0])
+    print("Rectangles:", count[1])
+    print("Squares:", count[2])
+    print("Triangles:", count[3])
+    print("Total:", len(y_train))
+    print("-" * 50)
+    return x_train, y_train
 
 def edge_detection(img):
     '''
@@ -89,16 +247,288 @@ def threshold(img):
 ##PREPROCESSING
 #::------------------------------------------------------------------------------------
 
-# Specify current working directory:
+# # Specify current working directory:
 os.chdir('..')
 cwd = os.getcwd()
 
+
+# Identify files for images
+circleFiles = os.listdir(os.path.join(cwd, 'Images/circle'))
+rectangleFiles = os.listdir(os.path.join(cwd, 'Images/rectangle'))
+squareFiles = os.listdir(os.path.join(cwd, 'Images/square'))
+triangleFiles = os.listdir(os.path.join(cwd, 'Images/triangle'))
+
+circleImages = []
+for i in range(len(circleFiles)):
+    preIm = cv2.imread(os.path.join(cwd, 'Images/circle/', circleFiles[i]), 0)
+    height, width = preIm.shape
+
+    # applying canny edge detection
+    edged = cv2.Canny(preIm, 10, 250)
+
+    # finding contours
+    (_, cnts, _) = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    idx = 0
+    for c in cnts:
+        x, y, w, h = cv2.boundingRect(c)
+        if w > h:
+            idx += 1
+            preImg = preIm[y:y + w, x:x + w]
+        else:
+            idx += 1
+            preImg = preIm[y:y + h, x:x + h]
+            # cropping images
+            #cv2.imwrite("cropped/" + str(idx) + '.png', new_img)
+
+    if height < 700:
+        preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
+
+    # PREPROCESSING: threshold
+    preIm = threshold(preIm)
+
+    circleImages.append(preIm)
+
+plt.imshow(circleImages[0])
+plt.show()
+
+rectangleImages = []
+for i in range(len(rectangleFiles)):
+    preIm = cv2.imread(os.path.join(cwd, 'Images/rectangle/', rectangleFiles[i]), 0)
+    height, width = preIm.shape
+
+    # applying canny edge detection
+    edged = cv2.Canny(preIm, 10, 250)
+
+    # finding contours
+    (_, cnts, _) = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    idx = 0
+    for c in cnts:
+        x, y, w, h = cv2.boundingRect(c)
+        if w > h:
+            idx += 1
+            preImg = preIm[y:y + w, x:x + w]
+        else:
+            idx += 1
+            preImg = preIm[y:y + h, x:x + h]
+            # cropping images
+            #cv2.imwrite("cropped/" + str(idx) + '.png', new_img)
+
+
+    # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
+    if height < 700:
+        preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
+
+    # PREPROCESSING: threshold
+    preIm = threshold(preIm)
+
+    rectangleImages.append(preIm)
+
+plt.imshow(rectangleImages[np.random.randint(1,500)])
+plt.show()
+
+squareImages = []
+for i in range(len(squareFiles)):
+    preIm = cv2.imread(os.path.join(cwd, 'Images/square/', squareFiles[i]), 0)
+    height, width = preIm.shape
+
+    # applying canny edge detection
+    edged = cv2.Canny(preIm, 10, 250)
+
+    # finding contours
+    (_, cnts, _) = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    idx = 0
+    for c in cnts:
+        x, y, w, h = cv2.boundingRect(c)
+        if w > h:
+            idx += 1
+            preImg = preIm[y:y + w, x:x + w]
+        else:
+            idx += 1
+            preImg = preIm[y:y + h, x:x + h]
+            # cropping images
+            #cv2.imwrite("cropped/" + str(idx) + '.png', new_img)
+
+
+    # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
+    if height < 700:
+        preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
+
+    # PREPROCESSING: threshold
+    preIm = threshold(preIm)
+
+    squareImages.append(preIm)
+
+plt.imshow(squareImages[np.random.randint(1,500)])
+plt.show()
+
+
+triangleImages = []
+for i in range(len(triangleFiles)):
+    preIm = cv2.imread(os.path.join(cwd, 'Images/triangle/', triangleFiles[i]), 0)
+    height, width = preIm.shape
+
+    # applying canny edge detection
+    edged2 = cv2.Canny(preIm, 10, 250)
+
+    # finding contours
+    (_, cnts, _) = cv2.findContours(edged2.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    idx = 0
+    for c in cnts:
+        x, y, w, h = cv2.boundingRect(c)
+        if w > h:
+            idx += 1
+            preImg = preIm[y:y + w, x:x + w]
+        else:
+            idx += 1
+            preImg = preIm[y:y + h, x:x + h]
+            # cropping images
+            #cv2.imwrite("cropped/" + str(idx) + '.png', new_img)
+
+            # cropping images
+
+    # if the size of the image is greater than 80 pixels in the height, resize to an 80x80 image:
+    if height > 10:
+        preIm = cv2.resize(preImg, (80, 80), interpolation=cv2.INTER_AREA)
+
+    # PREPROCESSING: threshold
+    preIm = threshold(preIm)
+
+    triangleImages.append(preIm)
+
+plt.imshow(triangleImages[np.random.randint(1,500)])
+plt.show()
+
+
+#Source of "Find and Crop" function: https://github.com/imneonizer/Find-and-crop-objects-From-images-using-OpenCV-and-Python/blob/master/crop_objects.py
+
+#############################################################################################################
+
+'''
+Save each image list as a 3D np array along with a classification array (circle, rectangle, square, or triangle)
+'''
+npCirc, npCircLab = np.array(circleImages), np.array(['circle']*len(circleImages))
+npRect, npRectLab = np.array(rectangleImages), np.array(['rectangle']*len(rectangleImages))
+npSqur, npSqurLab = np.array(squareImages), np.array(['square']*len(squareImages))
+npTrig, npTrigLab = np.array(triangleImages), np.array(['triangle']*len(triangleImages))
+
+#############################################################################################################
+
+#::------------------------------------------------------------------------------------
+##PREPROCESSING
+#::------------------------------------------------------------------------------------
+
+
+print("Starting image and label pre-processing...")
+
+print("-"*50)
+
+# look at labels and images shape
+label_data = np.append(npCircLab, np.append(npRectLab, np.append(npSqurLab, npTrigLab)))
+print("Labels shape:", label_data.shape)
+
+
+#One-hot encoding: Convert text-based labels to numbers
+le = preprocessing.LabelEncoder()
+le.fit(label_data)
+integer_labels = le.transform(label_data)
+
+#Confirm we have 4 unique classes
+print('Unique classes:', le.classes_)
+print("")
+print("Images and labels successfully preprocessed!")
+print("-"*50)
+
+#::------------------------------------------------------------------------------------
+##MODELING
+#::------------------------------------------------------------------------------------
+
+x = np.append(npCirc, np.append(npRect, np.append(npSqur, npTrig, axis=0), axis=0), axis=0)
+y = integer_labels
+
+# Generate a count of all classes in the presented, training dataset
+unique, count = np.unique(y, return_counts=True)
+
+print("Count classes before Data Split")
+print("Circles:", count[0])
+print("Rectangles:", count[1])
+print("Squares:", count[2])
+print("Triangles:", count[3])
+print("Total:", len(y))
+print("-" * 50)
+
+#::---------------------------------------------------------------------------------
+## Create a .txt output of model precursors and results
+#::---------------------------------------------------------------------------------
+# Generate a count of all classes in the total dataset before augmentation
+unique, count = np.unique(y, return_counts=True)
+
+file = open('ModelOutput.txt', 'w+')
+file.write('Count of Total Images before Augmentation:\n')
+file.write("Circles:\t\t%d\n" % count[0])
+file.write("Rectangles:\t\t%d\n" % count[1])
+file.write("Squares:\t\t%d\n" % count[2])
+file.write("Triangles:\t\t%d\n" % count[3])
+file.write("Total:\t\t%d\n" % len(y))
+file.write("-"*50)
+file.close()
+
+x, y = augment(x, y)
+# Train, test, split the data
+x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=40, test_size=0.20)#stratify=y)
+x_test_length = len(x_test)
+y_test_ex = y_test
+
+
+#x_train, y_train = augment(x_train, y_train, f=0)
+print("Data augmentation completed.")
+print("-" * 50)
+
+# Generate a count of all classes in the total dataset after augmentation
+unique, count = np.unique(y, return_counts=True)
+
+file = open('ModelOutput.txt', 'a+')
+file.write('\n\nCount of Total Images after Augmentation:\n')
+file.write("Circles:\t\t%d\n" % count[0])
+file.write("Rectangles:\t\t%d\n" % count[1])
+file.write("Squares:\t\t%d\n" % count[2])
+file.write("Triangles:\t\t%d\n" % count[3])
+file.write("Total:\t\t%d\n" % len(y))
+file.write("-"*50)
+file.close()
+
+
+
+# Generate a count of all classes in the training dataset after augmentation
+unique, count = np.unique(y_train, return_counts=True)
+
+file = open('ModelOutput.txt', 'a+')
+file.write('\nCount of Total Training Images after Augmentation:\n')
+file.write("Circles:\t\t%d\n" % count[0])
+file.write("Rectangles:\t\t%d\n" % count[1])
+file.write("Squares:\t\t%d\n" % count[2])
+file.write("Triangles:\t\t%d\n" % count[3])
+file.write("Total:\t\t%d\n" % len(y_train))
+file.write("-"*50)
+file.close()
+
+# Reshape the image data into rows
+x_train = np.reshape(x_train, (len(y_train), -1))
+print('Training data shape', namestr(x, globals())[0],":", x_train.shape)
+x_test = np.reshape(x_test, (len(y_test), -1))
+print('Test data shape', namestr(x, globals())[0],":", x_test.shape)
+
 # Standardizing the features
 sc_X = StandardScaler()
+x_train = sc_X.fit_transform(x_train)
+x_test = sc_X.transform(x_test)
 
-### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### ---
-# PQT Code:
-### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### ---
+
+
+
+
+
+
+
 
 class DrawingPad(QtWidgets.QLabel):
 
