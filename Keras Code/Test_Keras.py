@@ -700,6 +700,7 @@ class MainMenu(QMainWindow):
         msgBox.setInformativeText("Is this what you drew?")
         msgBox.addButton("Yes", QtWidgets.QMessageBox.DestructiveRole)
         msgBox.addButton("No", QtWidgets.QMessageBox.DestructiveRole)
+        msgBox.addButton("Cancel", QtWidgets.QMessageBox.DestructiveRole)
         msgBox.buttonClicked.connect(self.shapeButton)
         msgBox.exec()
         self.hbox.addWidget(msgBox)
@@ -707,8 +708,14 @@ class MainMenu(QMainWindow):
 
     def shapeButton(self, butt):
         if butt.text() == "Yes":
+            self.msgBoxClick
             self.close()
             MainMenu.__init__(self)
+
+        elif butt.text() == "Cancel":
+            self.close()
+            MainMenu.__init__(self)
+
         else:
             msgBox = QtWidgets.QMessageBox()
             msgBox.setText("What did you Draw?")

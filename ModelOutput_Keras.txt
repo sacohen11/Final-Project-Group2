@@ -24,6 +24,6 @@ Keras Multi-Layer 2D Perceptron Metrics:
 3 2D-Layers with 32, 64, and 128 filters1 Dense Layer with 512 filtersOutput:	a 4D vector output--------------------------------------------------
 
 Multi-Layer 2D Perceptron Performance:
-Run Time:		913.2214889 seconds
-Accuracy:		90.512
+Run Time:		259.31131719800004 seconds
+Accuracy:		93.373
 --------------------------------------------------
