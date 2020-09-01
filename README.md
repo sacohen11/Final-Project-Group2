@@ -1,6 +1,12 @@
-# Final-Project-Group2
+# Shapely
 
-This project aims to design a neural network to classify simple shapes.
+The next generation in virtual Pre-K education. 
+
+Shapely is a mobile app designed to be for toddlers. Shapely will teach your toddler how to draw basic shapes, such as circles, triangles, squares and rectangles. No parent supervision is required; the app is so easy your toddlers can work it by themselves.
+
+Shapely uses a machine learning algorithm trained on thousands of imperfect shape images to easily and accurately classify the shape your toddler draws. This interactive learning method puts traditional learning models on its head by actually allowing your toddler to draw and participate in the learning process.
+
+Future development will expand the Shapely concept to include letters, numbers, and more.
 
 # Structure of the Repository
 
